@@ -8,12 +8,14 @@ const config = {
   database: process.env.tedious_database,
   options: {
     encrypt: true,
-    enableArithAbort: true
-  }
+    enableArithAbort: true,
+  },
 };
 
 const pool = new sql.ConnectionPool(config);
-const poolConnect = pool.connect();
+const poolConnect = pool
+  .connect()
+  .then(() => console.log("DB Connection Succeed"));
 
 exports.execQuery = async function (query) {
   await poolConnect;
