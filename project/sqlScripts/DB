@@ -1,0 +1,46 @@
+-- -- Create a new table called 'Users' in schema 'dbo'
+-- -- Drop the table if it already exists
+-- IF OBJECT_ID('dbo.Users', 'U') IS NOT NULL
+-- DROP TABLE dbo.Users
+-- GO
+-- -- Create the table in the specified schema
+-- CREATE TABLE dbo.Users
+-- (
+--     user_id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+--     -- primary key column
+--     username [NVARCHAR]
+-- (9) NOT NULL,
+--     firstname [NVARCHAR]
+-- (50) NOT NULL,
+--     lastname [NVARCHAR]
+-- (50) NOT NULL,
+--     country [NVARCHAR]
+-- (50) NOT NULL,
+--     email [NVARCHAR]
+-- (50) NOT NULL,
+--     password [NVARCHAR]
+-- (100) NOT NULL,
+--     -- specify more columns here
+-- );
+-- GO
+-- Create a new table called 'Users' in schema 'dbo'
+-- Drop the table if it already exists
+
+
+
+
+-- Create a new table called 'FavoritePlayers' in schema 'dbo'
+-- Drop the table if it already exists
+IF OBJECT_ID('dbo.FavoritePlayers', 'U') IS NOT NULL
+DROP TABLE dbo.FavoritePlayers
+GO
+-- Create the table in the specified schema
+CREATE TABLE dbo.FavoritePlayers
+(
+    user_id INT NOT NULL ,
+    -- primary key column
+    player_id INT NOT NULL,
+    primary key (user_id, player_id),
+    -- specify more columns here
+);
+GO
