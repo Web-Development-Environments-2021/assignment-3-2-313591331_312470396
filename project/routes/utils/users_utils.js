@@ -5,19 +5,27 @@ async function markPlayerAsFavorite(user_id, player_ids) {
   const playersExist = await DButils.execQuery(
     `SELECT * FROM dbo.favoritePlayers WHERE user_id = '${user_id}'`
   );
-  if (player_ids.length + playersExist.length > 3) {
-    throw {
-      status: 409,
-      message: `There are already ${playersExist.length} players that belongs to your account.\nYou Tried to add ${player_ids.length} more.\nMax fav players are 3.`,
-    };
-  }
-  player_ids.map((id) =>
+  // if (player_ids.length + playersExist.length > 3) {
+  //   throw {
+  //     status: 409,
+  //     message: `There are already ${playersExist.length} players that belongs to your account.\nYou Tried to add ${player_ids.length} more.\nMax fav players are 3.`,
+  //   };
+  // }
+
+  player_ids.map((id) => {
+    if (playersExist.indexOf(id)) {
+      throw {
+        status: 409,
+        message:
+          "Player " + id + " already in favorite list. Action cancelled.",
+      };
+    }
     promises.push(
       DButils.execQuery(
         `insert into FavoritePlayers values ('${user_id}',${id})`
       )
-    )
-  );
+    );
+  });
   await Promise.all(promises);
 }
 

@@ -50,8 +50,10 @@ const port = process.env.PORT || "3000";
 const auth = require("./routes/auth");
 const users = require("./routes/users");
 const league = require("./routes/league");
-const teams = require("./routes/teams");
+const team = require("./routes/team");
 const dev = require("./routes/dev");
+const coach = require("./routes/coach");
+const player = require("./routes/player");
 
 //#endregion
 
@@ -78,8 +80,10 @@ app.get("/alive", (req, res) => res.send("I'm alive"));
 // Routings
 app.use("/users", users);
 app.use("/league", league);
-app.use("/teams", teams);
+app.use("/team", team);
 app.use("/dev", dev);
+app.use("/coach", coach);
+app.use("/player", player);
 app.use(auth);
 
 app.use(function (err, req, res, next) {
