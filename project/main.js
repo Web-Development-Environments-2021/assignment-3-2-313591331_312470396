@@ -27,7 +27,7 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
-app.use(express.static(path.join(__dirname, "public"))); //To serve static files such as images, CSS files, and JavaScript files
+// app.use(express.static(path.join(__dirname, "dist"))); //To serve static files such as images, CSS files, and JavaScript files
 
 // middleware to serve all the needed static files under the dist directory - loaded from the index.html file
 // https://expressjs.com/en/starter/static-files.html
@@ -54,6 +54,7 @@ const team = require("./routes/team");
 const dev = require("./routes/dev");
 const coach = require("./routes/coach");
 const player = require("./routes/player");
+const far = require("./routes/far");
 
 //#endregion
 
@@ -84,6 +85,7 @@ app.use("/team", team);
 app.use("/dev", dev);
 app.use("/coach", coach);
 app.use("/player", player);
+app.use("/far", far);
 app.use(auth);
 
 app.use(function (err, req, res, next) {
