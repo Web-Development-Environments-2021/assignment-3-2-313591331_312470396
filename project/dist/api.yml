@@ -1,0 +1,556 @@
+openapi: 3.0.3
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Berdugo1994/FootballLeagueManagement/1.0.0
+info:
+  description: Football League Management API
+  version: 1.0.0
+  title: Football management league
+  contact:
+    email: berdugoe@post.bgu.ac.il
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: auth
+    description: Login and register
+  - name: user
+    description: user handle.
+  - name: team
+    description: team data
+  - name: player
+    description: player data
+  - name: favorite
+    description: mange user favorites
+  
+paths:
+  /auth/login:
+    get:
+      tags:
+        - "auth"
+      summary: "User login into system"
+      operationId: "loginUser"
+      parameters:
+        - in: "query"
+          name: "username"
+          description: "username login"
+          required: true
+          schema:
+            type: "string"
+            minLength: 3
+            maxLength: 8
+            description: "Valid english chars only"
+        - in: "query"
+          name: "password"
+          required: true
+          schema:
+            type: "string"
+            minLength: 5
+            maxLength: 10
+            description: "at least one number and one special character"
+      responses:
+        '200':
+          description: "User login succeed"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: "incorrect username or password"
+  /auth/register:
+    post:
+      tags:
+      - "auth"
+      summary: "Create user"
+      description: "Added a user into the database"
+      operationId: "createUser"
+      requestBody:
+        description: JSON object for register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegUser'
+      responses:
+        '201':
+          description: "User creation succeed"
+        '401':
+          description: "cannot create user"
+  /user/mainPage/{userID}:
+    get:
+      tags:
+      - "user"
+      summary: "return user main page"
+      parameters: 
+        - name: "userID"
+          in: "path"
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userMainPage'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "user not found"
+  /teamPage/{teamID}:
+    get:
+      tags:
+      - "team"
+      summary: "Find team by ID"
+      description: "Returns a single team page"
+      operationId: "getTeamPage"
+      parameters:
+        - name: "teamID"
+          in: "path"
+          description: "ID of team to return"
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "successful operation,team returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeamPage'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Team not found"
+  /team/{teamID}:
+    get:
+      tags:
+      - "team"
+      summary: "Find team by ID"
+      description: "Returns a single team"
+      operationId: "getTeamByID"
+      parameters:
+        - name: "teamID"
+          in: "path"
+          description: "ID of team to return"
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "successful operation,team returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Team not found"
+  /player/{playerID}:
+    get:
+      tags:
+      - "player"
+      summary: "Find player by ID"
+      description: "Returns a single team"
+      operationId: "getPlayerByID"
+      parameters:
+        - name: "playerID"
+          in: "path"
+          description: "ID of player to return"
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "successful operation,team returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Player not found"
+  /coach/{coachID}:
+    get:
+      tags:
+      - "coach"
+      summary: "Find coach by ID"
+      description: "Returns a single coach"
+      operationId: "getCoachByID"
+      parameters:
+        - name: "coachID"
+          in: "path"
+          description: "ID of coach to return"
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "successful operation, coach returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coach'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Coach not found"
+  /favorite/:
+    put:
+      tags:
+      - "favorite"
+      summary: "add team,player or game to the favorite list"
+      operationId: "addToFavotire"
+      requestBody:
+        description: JSON object for register
+        required: true
+        content:
+          application/json:
+            schema:
+                type: object
+                example: "{userID: 11235-12345, elementID: 112346-1231, type: enum[TEAM,PLAYER,GAME]}"
+      responses:
+        '200':
+          description: "successful operation, element added to favorite"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Element not found"
+  /favorite/games/{userID}:
+    get:
+      tags:
+      - "favorite"
+      summary: "Get the favorite Games Page of user."
+      parameters:
+        - name: userID
+          in: "path"
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Game not found"
+  /favorite/teams/{userID}:
+    get:
+      tags:
+      - "favorite"
+      summary: "Get the favorite Teams Page of user."
+      parameters:
+        - name: userID
+          in: "path"
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Team not found"
+  /favorite/player/{userID}:
+    get:
+      tags:
+      - "favorite"
+      summary: "Get the favorite Players Page of user."
+      parameters:
+        - name: userID
+          in: "path"
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Player not found"
+      
+components:
+  schemas:
+    userMainPage:
+      type: "object"
+      required:
+        - user
+      properties:
+        user: 
+            $ref: '#/components/schemas/User'
+        favoritGames:
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+    RegUser:
+      type: "object"
+      required:
+        - name
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 8
+          description: "username must be between 3-8 chars and has valid english chars only"
+          example: "EdenBer"
+        firstname:
+          type: string
+          example: "barak"
+        lastname:
+          type: string
+          example: "falach"
+        country:
+          type: string
+          example: "israel"
+        email:
+          type: string
+          format: email
+        password:
+          description: "The password for login in clear text,5-10 chars, at least one number and one special character"
+          type: string
+          minLength: 5
+          maxLength: 10
+    GetTeamPage:
+      type: "object"
+      properties:
+        team:
+          $ref: "#/components/schemas/Team"
+        coach:
+          $ref: "#/components/schemas/Coach"
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/Player"
+    User:
+      type: "object"
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 8
+          description: "username must be between 3-8 chars and has valid english chars only"
+          example: "EdenBer"
+        firstname:
+          type: string
+          example: "barak"
+        lastname:
+          type: string
+          example: "falach"
+        country:
+          type: string
+          example: "israel"
+        email:
+          type: string
+          format: email
+        favorites:
+          type: object
+          properties:
+            players:
+              type: array
+              items:
+                type: integer
+                format: int32
+              example: ["411","004"]
+            teams:
+              type: array
+              items:
+                type: integer
+                format: int32
+              example: ["123","434"]
+            games:
+              type: array
+              items:
+                type: integer
+                format: int32
+              example: ["731","001"]
+    Team:
+      type: object
+      properties:
+        teamId:
+          type: string
+          example: "team5"
+        teamName:
+          type: string
+          example: "barak8995"
+        coach:
+          type: "string"
+          example: "coachId313"
+        players:
+          type: array
+          items:
+            type: integer
+            format: int32
+          example: [125,225]
+        country:
+          type: string
+          example: "israel"
+    Player:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 152
+        commonName:
+          type: string
+          example: "Neymar JR"
+        nationality:
+          type: string
+          example: "israeli"
+        date:
+          type: string
+          format: date
+          example: 24-10-1994
+        country:
+          type: string
+          example: "Israel"
+        height:
+          type: number
+          format: double
+          example: 1.72
+        weight:
+          type: number
+          format: double
+          description: "weight might be null"
+          example: 72.5
+        team:
+          type: string
+          example: "team_241"
+          description: "team_id"
+        photo:
+          type: string
+          format: url 
+    Coach:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 12
+        commonName:
+          type: string
+          example: "Pep Guardiola"
+        nationality:
+          type: string
+          example: "israeli"
+        date:
+          type: string
+          format: date
+          example: 24-10-1994
+        country:
+          type: string
+          example: "Israel"
+        team:
+          type: string
+          example: "team_241"
+          description: "team_id"
+        photo:
+          type: string
+          format: url 
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer 
+          format: int32
+          example: 14
+        homeTeamName: 
+          type: string
+          example: "Inter"
+        awayTeamName: 
+          type: string
+          example: "Milan"
+        date:
+          type: string
+          example: "DD/MM/YYYY/HH:MM"
+        stadium: 
+          type: string
+          example: "San-Siro"
+        homeTeamScore:
+          type: integer 
+          format: int32
+          example: 4
+        awayTeamScore:
+          type: integer 
+          format: int32
+          example: 1
+        gameReport: #game Report
+          $ref: '#/components/schemas/gameReport'
+    gameReport: 
+      type: object
+      properties: 
+        id: 
+          type: integer
+          format: int32
+          example: 24
+        reportsArray:
+          type: array
+          items: 
+            $ref: '#/components/schemas/report'
+    report:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 23
+        reportType:
+          type: string
+          enum: ["YELLOW_CARD", "RED_CARD","SUBSITUTE","FOUL","GOAL","OFFSIDE","INJURY"]
+          example: "YELLOW_CARD"
+        date:
+          type: string
+          example: "DD/MM/YYYY/HH:MM"
+        minute: 
+          type: integer
+          format: int32
+          example: 48
+        player1Name:
+          type: string
+          example: "lukaku"
+        player1ID:
+          type: number
+          format: int32
+          example: 20
+        player2Name:
+          type: string
+          example: "cavani"
+        player2ID:
+          type: number
+          format: int32
+          example: 21
+        description:
+          type: string
+          example: "free text for explaning the event"
