@@ -209,12 +209,12 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Coach not found"
-  /favorite/:
-    put:
+  /user/favorite/:
+    post:
       tags:
       - "favorite"
       summary: "add team,player or game to the favorite list"
-      operationId: "addToFavotire"
+      operationId: "addToFavorite"
       parameters:
         - name: "user_id"
           in: "cookie"
