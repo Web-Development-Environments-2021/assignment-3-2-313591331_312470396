@@ -215,14 +215,22 @@ paths:
       - "favorite"
       summary: "add team,player or game to the favorite list"
       operationId: "addToFavotire"
-      requestBody:
-        description: JSON object for register
-        required: true
-        content:
-          application/json:
-            schema:
-                type: object
-                example: "{userID: 11235-12345, elementID: 112346-1231, type: enum[TEAM,PLAYER,GAME]}"
+      parameters:
+        - name: "user_id"
+          in: "cookie"
+          schema:
+            type: string
+        - name: "favorite_id"
+          in: "body"
+          schema:
+            type: string
+            example: "0023"
+        - name: "type"
+          in: "body"
+          schema:
+            type: string
+            enum: ["TEAM,GAME,PLAYER"]
+            example: "TEAM"
       responses:
         '200':
           description: "successful operation, element added to favorite"
