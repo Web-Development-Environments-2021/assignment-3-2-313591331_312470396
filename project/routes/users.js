@@ -5,26 +5,20 @@ const player_utils = require("./utils/player_utils");
 const game_utils = require("./utils/game_utils");
 const team_utils = require("./utils/team_utils");
 const user_auth = require("../middleware/mid_user");
-/**
- * Authenticate all incoming requests by middleware
- */
-router.use(user_auth);
-/**
- * This path gets body with playerId and save this player in the favorites list of the logged-in user
- */
+router.use(user_auth); // Checks all incoming requests are from Logged users(checked by cookie).
 router.post("/Favorite", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const favorite_type = req.body.favorite_type;
     const favorite_id = req.body.favorite_id;
     switch (favorite_type) {
-      case "Team":
+      case "TEAM":
         team_utils.markTeamAsFavorite(user_id, favorite_id);
         break;
-      case "Player":
+      case "PLAYER":
         player_utils.markPlayerAsFavorite(user_id, favorite_id);
         break;
-      case "Game":
+      case "GAME":
         game_utils.markGameAsFavorite(user_id, favorite_id);
         break;
     }

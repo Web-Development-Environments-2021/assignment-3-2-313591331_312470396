@@ -82,6 +82,27 @@ paths:
           description: "cannot create user"
         '409':
           description: "username is taken"
+    /auth/logout:
+    get:
+      tags:
+      - "auth"
+      summary: "logout user"
+      description: "logging out a user and deletes his cookie."
+      operationId: "LogOut"
+      parameters:
+        - in: "cookie"
+          name: "user_id"
+          description: "user-logged in id"
+          required: true
+        - in: "cookie"
+          name: "type"
+          description: "user type"
+          required: true
+      responses:
+        '201':
+          description: "User logout succeed"
+        '401':
+          description: "User is already logged out"
   /user/mainPage/:
     get:
       tags:
