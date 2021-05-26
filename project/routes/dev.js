@@ -29,4 +29,16 @@ router.get("/favoritePlayersTable", async (req, res, next) => {
   }
 });
 
+router.get("/favoriteGamesTable", async (req, res, next) => {
+  try {
+    const result = await DButils.execQuery(
+      "SELECT * FROM dbo.FavoriteGames "
+    );
+    console.log(result);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
