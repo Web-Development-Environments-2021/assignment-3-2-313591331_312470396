@@ -230,28 +230,24 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Coach not found"
-  /favorite/:
-    put:
+  /user/favorite/:
+    post:
       tags:
       - "favorite"
       summary: "add team,player or game to the favorite list"
-      operationId: "addToFavotire"
+      operationId: "addToFavorite"
       parameters:
         - name: "user_id"
           in: "cookie"
           schema:
             type: string
-        - name: "favorite_id"
-          in: "body"
-          schema:
-            type: string
-            example: "0023"
-        - name: "type"
-          in: "body"
-          schema:
-            type: string
-            enum: ["TEAM,GAME,PLAYER"]
-            example: "TEAM"
+      requestBody:
+        description: JSON object for register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/addToFavorite'
       responses:
         '200':
           description: "successful operation, element added to favorite"
@@ -728,7 +724,17 @@ components:
         description:
           type: string
           example: "free text for explaning the event"
-
+    addToFavorite:
+      type: "object"
+      properties:
+        favorite_id:
+          type: integer
+          format: int32 
+          example: 2
+        type:
+          type: string
+          enum: ["TEAM","PLAYER","GAME"]
+          example: "TEAM"
     AddGame:
       type: "object"
       properties:
