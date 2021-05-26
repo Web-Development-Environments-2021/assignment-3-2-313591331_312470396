@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const farUtils = require("./utils/far_utils");
+const gameUtils = require("./utils/game_utils");
 const far_auth = require("../middleware/mid_FAR");
 router.use(far_auth);
 router.post("/addReferee", async (req, res, next) => {
@@ -19,5 +20,30 @@ router.post("/addReferee", async (req, res, next) => {
     next(error);
   }
 });
-
+router.post("/addGame", async (req, res, next) => {
+  try {
+    const leagueID = req.body.leagueID;
+    const seasonID = req.body.seasonID;
+    const stageID = req.body.stageID;
+    const refereeID = req.body.refereeID;
+    const stadiumID = req.body.stadiumID;
+    const homeTeamID = req.body.homeTeamID;
+    const awayTeamID = req.body.awayTeamID;
+    const gameDate = req.body.gameDate;
+    // might be undefined. Handled in the game-util.
+    await gameUtils.addGame(
+      leagueID,
+      seasonID,
+      stageID,
+      refereeID,
+      stadiumID,
+      homeTeamID,
+      awayTeamID,
+      gameDate
+    );
+    res.status(201).send("Game added successfully");
+  } catch (error) {
+    next(error);
+  }
+});
 module.exports = router;
