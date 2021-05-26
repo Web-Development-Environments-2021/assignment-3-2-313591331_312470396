@@ -32,5 +32,17 @@ async function addGame(
   }
 }
 
+async function markGameAsFavorite(user_id, game_id) {
+  try {
+    await getPlayerUtils(game_id);
+  } catch (error) {
+    throw { status: 404, message: "Game " + game_id + " doesn't exist!" };
+  }
+  DButils.execQuery(
+    `insert into FavoritePlayers values ('${user_id}',${game_id})`
+  );
+}
+
 exports.getGames = getGames;
 exports.addGame = addGame;
+exports.markGameAsFavorite = markGameAsFavorite;
