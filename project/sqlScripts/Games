@@ -1,0 +1,19 @@
+IF OBJECT_ID('dbo.Games', 'U') IS NOT NULL
+DROP TABLE dbo.Games
+GO
+-- Create the table in the specified schema
+CREATE TABLE dbo.Games
+(
+    gameID INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+    leagueID INT NOT NULL,
+    seasonID INT NOT NULL,
+    stageID INT NOT NULL,
+    refereeID INT NOT NULL,
+    homeTeamID INT NOT NULL,
+    awayTeamID INT NOT NULL,
+    gameDate DATE NOT NULL,
+    homeScore INT NOT NULL,
+    awayScore INT NOT NULL,
+    gameReportID INT NOT NULL
+);
+GO

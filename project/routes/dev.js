@@ -4,8 +4,15 @@ const DButils = require("./utils/DButils");
 router.get("/usersTable", async (req, res, next) => {
   try {
     const result = await DButils.execQuery("SELECT * FROM dbo.Users ");
-    console.log(result[0]);
-    res.status(200).send(result[0]);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+});
+router.get("/refereesTable", async (req, res, next) => {
+  try {
+    const result = await DButils.execQuery("SELECT * FROM dbo.Referees ");
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }

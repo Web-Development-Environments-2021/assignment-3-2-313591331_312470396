@@ -1,3 +1,4 @@
+//Checking that the account is logged.
 var express = require("express");
 var router = express.Router();
 const DButils = require("../routes/utils/DButils");
