@@ -77,7 +77,9 @@ paths:
           description: "User creation succeed"
         '401':
           description: "cannot create user"
-  /user/mainPage/{userID}:
+        '409':
+          description: "username is taken"
+  /user/mainPage/:
     get:
       tags:
       - "user"
@@ -157,7 +159,7 @@ paths:
       tags:
       - "player"
       summary: "Find player by ID"
-      description: "Returns a single team"
+      description: "Returns a single player"
       operationId: "getPlayerByID"
       parameters:
         - name: "playerID"
@@ -300,6 +302,27 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Player not found"
+  /far/addReferee:
+    post:
+      tags:
+      - "referee"
+      summary: "Add a referee"
+      description: "Added a user into the referee DB"
+      operationId: "addReferee"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/referee'
+      responses:
+        '201':
+          description: "User creation succeed"
+        '401':
+          description: "cannot create user"
+        '409':
+          description: "username is taken"
+      
       
 components:
   schemas:
@@ -333,15 +356,21 @@ components:
           example: "falach"
         country:
           type: string
-          example: "israel"
+          example: "Israel"
         email:
           type: string
           format: email
+        img:
+          type: string
+          example: "www.img.url.EranZehavi"
         password:
           description: "The password for login in clear text,5-10 chars, at least one number and one special character"
           type: string
           minLength: 5
           maxLength: 10
+        type:
+          type: string
+          example: "TeamUser"
     GetTeamPage:
       type: "object"
       properties:
@@ -519,6 +548,16 @@ components:
           type: array
           items: 
             $ref: '#/components/schemas/report'
+    referee: 
+      type: object
+      properties: 
+        user_id: 
+          type: integer
+          format: int32
+          example: 24
+        qualification:
+          type: string
+          example: "Primary"
     report:
       type: object
       properties:
