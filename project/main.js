@@ -58,7 +58,7 @@ app.use("/coach", coach);
 app.use("/player", player);
 app.use("/far", far);
 app.use("/auth", auth);
-app.use(league);
+app.use("/league", league);
 app.use(function (err, req, res, next) {
   console.error(err);
   res.status(err.status || 500).send(err.message);

@@ -13,45 +13,61 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
+  - name: main
+    description: Landing page
   - name: auth
-    description: Login and register
-  - name: user
-    description: user handle.
+    description: Login, Register and Logout actions
   - name: team
-    description: team data
+    description: Team data
   - name: player
-    description: player data
+    description: Player data
   - name: favorite
-    description: mange user favorites
-  - name: league
-    description: league details
+    description: Favorites Players, Teams, Games
   - name: game
-    description: Game get and add.
+    description: Games data
 paths:
-  /auth/login:
+  /league/:
     get:
       tags:
-        - "auth"
-      summary: "User login into system"
-      operationId: "loginUser"
+        - "main"
+      summary: "main league page"
+      operationId: "getMainLeaguePage"
       parameters:
-        - in: "query"
-          name: "username"
-          description: "username login"
-          required: true
+        - in: "cookie"
+          name: "user_id"
+          description: "user cookie"
+          required: false
+        - in: "cookie"
+          name: "type"
+          description: "user cookie"
+          required: false
+      responses:
+        '200':
+          description: "logged user main page"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/leagueMainPageUser'
+        '206':
+          description: "guest main page - partial returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/leagueMainPage'
+  /auth/login:
+    post:
+    tags:
+        - "auth"
+    summary: "User login into system"
+    operationId: "loginUser"
+    requestBody:
+      description: JSON object for login
+      required: true
+      content:
+        required: true
+        application/json:
           schema:
-            type: "string"
-            minLength: 3
-            maxLength: 8
-            description: "Valid english chars only"
-        - in: "query"
-          name: "password"
-          required: true
-          schema:
-            type: "string"
-            minLength: 5
-            maxLength: 10
-            description: "at least one number and one special character"
+            $ref: '#/components/schemas/LoginBody'
       responses:
         '200':
           description: "User login succeed"
@@ -103,62 +119,13 @@ paths:
           description: "User logout succeed"
         '401':
           description: "User is already logged out"
-  /user/mainPage/:
-    get:
-      tags:
-      - "user"
-      summary: "return user main page"
-      parameters: 
-        - name: "userID"
-          in: "path"
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/userMainPage'
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "user not found"
-  /teamPage/{teamID}:
-    get:
-      tags:
-      - "team"
-      summary: "Find team by ID"
-      description: "Returns a single team page"
-      operationId: "getTeamPage"
-      parameters:
-        - name: "teamID"
-          in: "path"
-          description: "ID of team to return"
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: "successful operation,team returned"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetTeamPage'
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Team not found"
   /team/{teamID}:
     get:
       tags:
       - "team"
       summary: "Find team by ID"
-      description: "Returns a single team"
-      operationId: "getTeamByID"
+      description: "Returns a single team page"
+      operationId: "getTeamPageByID"
       parameters:
         - name: "teamID"
           in: "path"
@@ -173,7 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Team'
+                $ref: '#/components/schemas/TeamPage'
         "400":
           description: "Invalid ID supplied"
         "404":
@@ -183,8 +150,8 @@ paths:
       tags:
       - "player"
       summary: "Find player by ID"
-      description: "Returns a single player"
-      operationId: "getPlayerByID"
+      description: "Returns a single player page"
+      operationId: "getPlayerPageByID"
       parameters:
         - name: "playerID"
           in: "path"
@@ -204,37 +171,11 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Player not found"
-  /coach/{coachID}:
-    get:
-      tags:
-      - "coach"
-      summary: "Find coach by ID"
-      description: "Returns a single coach"
-      operationId: "getCoachByID"
-      parameters:
-        - name: "coachID"
-          in: "path"
-          description: "ID of coach to return"
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: "successful operation, coach returned"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Coach'
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Coach not found"
   /user/favorite/:
     post:
       tags:
       - "favorite"
-      summary: "add team,player or game to the favorite list"
+      summary: "Add Team,Player or Game to the favorite list"
       operationId: "addToFavorite"
       parameters:
         - name: "user_id"
@@ -247,7 +188,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/addToFavorite'
+              $ref: '#/components/schemas/FavoriteBody'
       responses:
         '200':
           description: "successful operation, element added to favorite"
@@ -255,21 +196,20 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Element not found"
-  /favorite/games/{userID}:
     get:
       tags:
       - "favorite"
-      summary: "Get the favorite Games Page of user."
+      summary: "Get the favorite Games of user.(Only Games!)"
       parameters:
-        - name: userID
-          in: "path"
+        - name: user_id
+          in: "cookie"
           required: true
           schema:
             type: integer
             format: int32
       responses:
         '200':
-          description: "successful operation"
+          description: "successful operation - players returned"
           content:
             application/json:
               schema:
@@ -278,84 +218,6 @@ paths:
                   $ref: '#/components/schemas/Game'
         "400":
           description: "Invalid ID supplied"
-        "404":
-          description: "Game not found"
-  /favorite/teams/{userID}:
-    get:
-      tags:
-      - "favorite"
-      summary: "Get the favorite Teams Page of user."
-      parameters:
-        - name: userID
-          in: "path"
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '200':
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Team'
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Team not found"
-  /favorite/player/{userID}:
-    get:
-      tags:
-      - "favorite"
-      summary: "Get the favorite Players Page of user."
-      parameters:
-        - name: userID
-          in: "path"
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '200':
-          description: "successful operation"
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Player'
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Player not found"
-  /league:
-    get:
-      tags:
-        - "league"
-      summary: "main league page"
-      operationId: "getMainLeaguePage"
-      parameters:
-        - in: "cookie"
-          name: "user_id"
-          description: "user cookie"
-          required: false
-      responses:
-        '200':
-          description: "logged user main page "
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/leagueMainPageUser'
-        '201':
-          description: "guest main page "
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/leagueMainPage'
-        '400':
-          description: "incorrect username or password"
   /far/addReferee:
     post:
       tags:
@@ -363,6 +225,20 @@ paths:
       summary: "Add a referee"
       description: "Added a user into the referee DB"
       operationId: "addReferee"
+      parameters:
+        - name: user_id
+          in: "cookie"
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: type
+          in: "cookie"
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: "FAR"
       requestBody:
         required: true
         content:
@@ -371,7 +247,7 @@ paths:
               $ref: '#/components/schemas/referee'
       responses:
         '201':
-          description: "User creation succeed"
+          description: "Referee add succeed"
         '401':
           description: "cannot create user"
         '409':
@@ -388,7 +264,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddGame'
+              $ref: '#/components/schemas/AddGameBody'
       responses:
         '201':
           description: "User creation succeed"
@@ -485,7 +361,6 @@ components:
           type: integer
           format: int32
           example: 2
-
     userMainPage:
       type: "object"
       required:
@@ -531,7 +406,7 @@ components:
         type:
           type: string
           example: "TeamUser"
-    GetTeamPage:
+    TeamPage:
       type: "object"
       properties:
         team:
@@ -724,18 +599,18 @@ components:
         description:
           type: string
           example: "free text for explaning the event"
-    addToFavorite:
+    FavoriteBody:
       type: "object"
       properties:
         favorite_id:
           type: integer
           format: int32 
           example: 2
-        type:
+        favorite_type:
           type: string
           enum: ["TEAM","PLAYER","GAME"]
           example: "TEAM"
-    AddGame:
+    AddGameBody:
       type: "object"
       properties:
         leagueID:
@@ -770,3 +645,12 @@ components:
           type: string
           format: DATETIME
           example: "15-11-2021-20:00:00"
+    LoginBody:
+      type: "object"
+      properties:
+        username:
+          type: string
+          example: "EdenRef"
+        password:
+          type: string
+          example: "2410!e"
