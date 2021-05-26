@@ -1,6 +1,6 @@
 const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
-
+const DButils = require("./DButils");
 async function getTeamUtils(team_id) {
   let team = await axios.get(`${api_domain}/teams/${team_id}`, {
     params: {
@@ -8,15 +8,27 @@ async function getTeamUtils(team_id) {
       api_token: process.env.api_token,
     },
   });
-  team = {...team.data.data}
+  team = { ...team.data.data };
   return {
     id: team.id,
     name: team.name,
     shortCode: team.short_code,
     logo: team.logo_path,
     players: team.squad.data,
-    coach: team.coach.data
+    coach: team.coach.data,
   };
 }
 
-exports.getTeamUtils = getTeamUtils
+async function markTeamAsFavorite(user_id, team_id) {
+  try {
+    await getTeamUtils(team_id);
+  } catch (error) {
+    throw { status: 404, message: "Team " + team_id + " doesn't exist!" };
+  }
+  DButils.execQuery(
+    `insert into FavoriteTeams values ('${user_id}',${team_id})`
+  );
+}
+
+exports.getTeamUtils = getTeamUtils;
+exports.markTeamAsFavorite = markTeamAsFavorite;

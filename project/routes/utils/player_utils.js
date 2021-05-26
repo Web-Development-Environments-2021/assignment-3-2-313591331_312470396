@@ -1,5 +1,6 @@
 const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
+const DButils = require("./DButils");
 async function getPlayerUtils(player_id) {
   const player = await axios.get(`${api_domain}/players/${player_id}`, {
     params: {
@@ -73,6 +74,18 @@ async function getPlayersByTeam(team_id) {
   return players_info;
 }
 
+async function markPlayerAsFavorite(user_id, player_id) {
+  try {
+    await getPlayerUtils(player_id);
+  } catch (error) {
+    throw { status: 404, message: "Player " + player_id + " doesn't exist!" };
+  }
+  DButils.execQuery(
+    `insert into FavoritePlayers values ('${user_id}',${player_id})`
+  );
+}
+
 exports.getPlayersByTeam = getPlayersByTeam;
 exports.getPlayersInfo = getPlayersInfo;
 exports.getPlayerUtils = getPlayerUtils;
+exports.markPlayerAsFavorite = markPlayerAsFavorite;
