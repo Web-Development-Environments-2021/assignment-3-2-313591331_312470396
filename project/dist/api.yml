@@ -25,6 +25,8 @@ tags:
     description: mange user favorites
   - name: league
     description: league details
+  - name: game
+    description: Game get and add.
 paths:
   /auth/login:
     get:
@@ -349,6 +351,26 @@ paths:
           description: "cannot create user"
         '409':
           description: "username is taken"
+  /far/addGame:
+    post:
+      tags:
+      - "game"
+      summary: "Add a game between two 2 teams"
+      description: "Add a game into the games DB"
+      operationId: "addGame"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddGame'
+      responses:
+        '201':
+          description: "User creation succeed"
+        '401':
+          description: "cannot create user"
+        '409':
+          description: "username is taken"
 components:
   schemas:
     leagueMainPageUser:
@@ -387,7 +409,7 @@ components:
           example: 7744854
         nextGame:
           $ref: '#/components/schemas/game'
-    game:
+    Game:
       type: "object"
       properties:
         gameID:
@@ -409,7 +431,11 @@ components:
         refereeID:
           type: integer
           format: int32
-          example: 004
+          example: 001
+        stadiumID:
+          type: integer
+          format: int32
+          example: 124
         homeTeamID:
           type: integer
           format: int32
@@ -673,3 +699,39 @@ components:
         description:
           type: string
           example: "free text for explaning the event"
+
+    AddGame:
+      type: "object"
+      properties:
+        leagueID:
+          type: integer
+          format: int32
+          example: 271
+        seasonID:
+          type: integer
+          format: int32
+          example: 145
+        stageID:
+          type: integer
+          format: int32
+          example: 467
+        refereeID:
+          type: integer
+          format: int32
+          example: 001
+        stadiumID:
+          type: integer
+          format: int32
+          example: 124
+        homeTeamID:
+          type: integer
+          format: int32
+          example: 003
+        awayTeamID:
+          type: integer
+          format: int32
+          example: 004
+        gameDate:
+          type: string
+          format: DATETIME
+          example: "15-11-2021-20:00:00"

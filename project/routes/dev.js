@@ -17,6 +17,16 @@ router.get("/refereesTable", async (req, res, next) => {
     next(error);
   }
 });
+
+router.get("/gamesTable", async (req, res, next) => {
+  try {
+    const result = await DButils.execQuery("SELECT * FROM dbo.Games ");
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/favoritePlayersTable", async (req, res, next) => {
   try {
     const result = await DButils.execQuery(
