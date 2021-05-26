@@ -5,7 +5,7 @@ const DButils = require("./DButils");
 async function getGames(game_id) {
   console.log(game_id)
   const gamesData = await DButils.execQuery(
-    `SELECT game from games WHERE game_id IN '${game_id}'`
+    `SELECT * FROM [dbo].[Games] WHERE game_id IN '${game_id}'`
   );
   return gamesData;
 }
