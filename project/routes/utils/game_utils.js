@@ -1,11 +1,29 @@
 const { NText } = require("mssql");
 const DButils = require("./DButils");
 
-//TODO:: get what DB return  
-async function getGames(game_id) {
-  console.log(game_id)
+async function getGameUtils(game_id) {
+  const gameIds = "(" + game_id.reduce((accumulator,id) => `${accumulator},${id}`) + ")"
+  console.log(gameIds)
   const gamesData = await DButils.execQuery(
-    `SELECT * FROM [dbo].[Games] WHERE game_id IN '${game_id}'`
+    `SELECT * FROM [dbo].[Games] WHERE gameID IN ${gameIds}`
+  );
+  return gamesData;
+}
+
+async function getGameByTeam(team_id) {
+  const gamesData = await DButils.execQuery(
+    `SELECT  *
+    FROM  [dbo].[Games]
+    WHERE homeTeamID = ${team_id} OR awayTeamID = ${team_id}`
+  );
+  return gamesData;
+}
+
+async function getGameByStage(stage_id) {
+  const gamesData = await DButils.execQuery(
+    `SELECT  *
+    FROM  [dbo].[Games]
+    WHERE stageID = ${stage_id}`
   );
   return gamesData;
 }
@@ -43,6 +61,8 @@ async function markGameAsFavorite(user_id, game_id) {
   );
 }
 
-exports.getGames = getGames;
+exports.getGameUtils = getGameUtils;
+exports.getGameByTeam = getGameByTeam
+exports.getGameByStage = getGameByStage
 exports.addGame = addGame;
 exports.markGameAsFavorite = markGameAsFavorite;

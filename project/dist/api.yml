@@ -25,6 +25,8 @@ tags:
     description: Favorites Players, Teams, Games
   - name: game
     description: Games data
+  - name: stage
+    description: Stage Data
 paths:
   /league/:
     get:
@@ -123,12 +125,12 @@ paths:
     get:
       tags:
       - "team"
-      summary: "Find team by ID"
+      summary: "get Team Page"
       description: "Returns a single team page"
       operationId: "getTeamPageByID"
       parameters:
-        - name: "teamID"
-          in: "path"
+        - in: "path"
+          name: "teamID"
           description: "ID of team to return"
           required: true
           schema:
@@ -140,11 +142,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamPage'
+                $ref: '#/components/schemas/teamPage'
         "400":
           description: "Invalid ID supplied"
         "404":
           description: "Team not found"
+  /stage/{stageID}:
+    get:
+      tags:
+      - "stage"
+      summary: "Find stage page by ID"
+      description: "Returns a single stage page"
+      operationId: "getStagePageByID"
+      parameters:
+        - name: "stageID"
+          in: "path"
+          description: "ID of Stage to return"
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: "successful operation,team returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stagePage'
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "stage not found"
   /player/{playerID}:
     get:
       tags:
@@ -166,20 +194,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Player'
+                $ref: '#/components/schemas/playerPage'
         "400":
           description: "Invalid ID supplied"
         "404":
           description: "Player not found"
-  /user/favorite/:
+  /users/favorite/:
     post:
       tags:
       - "favorite"
       summary: "Add Team,Player or Game to the favorite list"
       operationId: "addToFavorite"
       parameters:
-        - name: "user_id"
-          in: "cookie"
+        - in: "cookie"
+          name: "user_id"
           schema:
             type: string
       requestBody:
@@ -196,13 +224,14 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Element not found"
+  /users/favorite/game: 
     get:
       tags:
       - "favorite"
       summary: "Get the favorite Games of user.(Only Games!)"
       parameters:
-        - name: user_id
-          in: "cookie"
+        - in: "cookie"
+          name: user_id
           required: true
           schema:
             type: integer
@@ -406,17 +435,6 @@ components:
         type:
           type: string
           example: "TeamUser"
-    TeamPage:
-      type: "object"
-      properties:
-        team:
-          $ref: "#/components/schemas/Team"
-        coach:
-          $ref: "#/components/schemas/Coach"
-        players:
-          type: array
-          items:
-            $ref: "#/components/schemas/Player"
     User:
       type: "object"
       properties:
@@ -462,42 +480,54 @@ components:
     Team:
       type: object
       properties:
-        teamId:
+        id:
+          type: integer
+          format: int32
+          example: 101
+        name:
           type: string
-          example: "team5"
-        teamName:
+          example: "Barcelona"
+        shortCode:
           type: string
-          example: "barak8995"
-        coach:
-          type: "string"
-          example: "coachId313"
-        players:
-          type: array
-          items:
-            type: integer
-            format: int32
-          example: [125,225]
-        country:
+          example: "FCB"
+        logo:
           type: string
-          example: "israel"
-    Player:
+          example: "www.logo.com"
+    PlayerPreview:
+      type: object
+      properties:
+        full_name:
+          type: string
+          example: "Neymar da Silva Santos Junior"
+        team:
+          type: string
+          example: "PSG"
+        photo:
+          type: string
+          format: url 
+          example: "www.photo.com"
+        position_id:
+          type: integer
+          format: int32
+          example: 1
+    PlayerAdditional:
       type: object
       properties:
         id:
           type: integer
           format: int32
           example: 152
-        commonName:
+        common_name:
           type: string
           example: "Neymar JR"
         nationality:
           type: string
           example: "israeli"
-        date:
+        birthdate:
           type: string
           format: date
           example: 24-10-1994
-        country:
+        birthcountry:
           type: string
           example: "Israel"
         height:
@@ -509,40 +539,6 @@ components:
           format: double
           description: "weight might be null"
           example: 72.5
-        team:
-          type: string
-          example: "team_241"
-          description: "team_id"
-        photo:
-          type: string
-          format: url 
-    Coach:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-          example: 12
-        commonName:
-          type: string
-          example: "Pep Guardiola"
-        nationality:
-          type: string
-          example: "israeli"
-        date:
-          type: string
-          format: date
-          example: 24-10-1994
-        country:
-          type: string
-          example: "Israel"
-        team:
-          type: string
-          example: "team_241"
-          description: "team_id"
-        photo:
-          type: string
-          format: url 
     gameReport: 
       type: object
       properties: 
@@ -654,3 +650,45 @@ components:
         password:
           type: string
           example: "2410!e"
+    playerPage:
+      type: "object"
+      properties:
+        additional:
+          $ref: '#/components/schemas/PlayerAdditional'
+        preview:
+          $ref: '#/components/schemas/PlayerPreview'
+    teamPage:
+      type: "object"
+      properties:
+        teamPreview:
+         $ref: '#/components/schemas/Team'
+        players:
+          type: array
+          items: 
+            $ref: '#/components/schemas/PlayerPreview'
+        upcoming_games:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Game'
+        previous_games:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Game'
+    stagePage:
+      type: "object"
+      properties:
+        stageID:
+          type: int
+          format: int32
+          example: 450
+        upcoming_games:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Game'
+        previous_games:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Game'
+
+
+

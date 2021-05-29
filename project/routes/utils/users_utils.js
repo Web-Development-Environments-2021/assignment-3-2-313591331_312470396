@@ -36,9 +36,10 @@ async function getFavoritePlayers(user_id) {
   return player_ids;
 }
 
+
 async function getFavoriteGames(user_id) { 
   const game_ids = await DButils.execQuery(
-    `select game_id from FavoriteGames where user_id='${user_id}'`
+    `SELECT game_id FROM [dbo].[FavoriteGames] WHERE user_id = '${user_id}'`
   );
   return game_ids;
 }

@@ -47,6 +47,8 @@ const dev = require("./routes/dev");
 const coach = require("./routes/coach");
 const player = require("./routes/player");
 const far = require("./routes/far");
+const game = require("./routes/game");
+const stage = require("./routes/stage");
 //#endregion
 // ----> For cheking that our server is alive
 app.get("/alive", (req, res) => res.send("I'm alive"));
@@ -59,6 +61,8 @@ app.use("/player", player);
 app.use("/far", far);
 app.use("/auth", auth);
 app.use("/league", league);
+app.use("/game", game);
+app.use("/stage", stage);
 app.use(function (err, req, res, next) {
   console.error(err);
   res.status(err.status || 500).send(err.message);

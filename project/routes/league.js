@@ -14,6 +14,7 @@ router.use(function (err, req, res, next) {
 const guestMainPage =  async (req, res, next) => {
   try {
     const league_details = await league_utils.getLeagueDetails();
+    res.status(200)
     res.send(league_details);
   } catch (error) {
     next(error);
@@ -24,7 +25,8 @@ router.get("/", async (req, res, next) => {
   try {
     const league_details = await league_utils.getLeagueDetails();
     const userFavoriteGames = await users_utils.getFavoriteGames(req.session.user_id);
-    const gamesData = await game_utils.getGames(userFavoriteGames)
+    const gamesData = await game_utils.getGameUtils(userFavoriteGames)
+    res.status(201)
     res.send({league_details,gamesData});
   } catch (error) {
     next(error);
