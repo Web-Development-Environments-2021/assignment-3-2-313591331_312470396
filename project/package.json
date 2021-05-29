@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "football mangment system ",
   "main": "main.js",
-  
   "scripts": {
     "//": " do *npm start* to start server with nodemon, npm main.js to start server without nodemon",
-    "start": "nodemon main.js"
+    "start": "nodemon main.js",
+    "test": "jest"
   },
   "author": "barak eden",
   "license": "ISC",
@@ -22,6 +22,7 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
+    "jest": "^27.0.1",
     "nodemon": "^2.0.7"
   }
 }

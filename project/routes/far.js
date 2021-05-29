@@ -4,6 +4,13 @@ const farUtils = require("./utils/far_utils");
 const gameUtils = require("./utils/game_utils");
 const far_auth = require("../middleware/mid_FAR");
 router.use(far_auth);
+router.get("/", async (req, res, next) => {
+  try{
+    res.send( await gameUtils.gelAllGames())
+  }catch(err){
+    res.send(err)
+  }
+})
 router.post("/addReferee", async (req, res, next) => {
   try {
     const qualification = req.body.qualification;
@@ -20,6 +27,21 @@ router.post("/addReferee", async (req, res, next) => {
     next(error);
   }
 });
+
+router.put("/addGameResult", async (req,res,next) => {
+  try{
+    // const {gameID,homeTeamResult,awayTeamResult} = req.body
+    res.send(await gameUtils.addGameResult(req.body))
+    // res.send({gameID,homeTeamResult,awayTeamResult})
+  }catch(err){res(err)}
+})
+
+router.post("/addReport", async (req,res,next) => {
+  try{
+    res.send(await gameUtils.addReport(req.body))
+  }catch(err){res(err)}
+})
+
 router.post("/addGame", async (req, res, next) => {
   try {
     const leagueID = req.body.leagueID;

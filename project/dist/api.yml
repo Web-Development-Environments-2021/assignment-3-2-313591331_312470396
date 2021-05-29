@@ -2,7 +2,7 @@ openapi: 3.0.3
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/Berdugo1994/FootballLeagueManagement/1.0.0
+    url: http://localhost:3000
 info:
   description: Football League Management API
   version: 1.0.0
@@ -27,6 +27,8 @@ tags:
     description: Games data
   - name: stage
     description: Stage Data
+  - name: FAR
+    description: FootBall Association Representor actions 
 paths:
   /league/:
     get:
@@ -281,6 +283,84 @@ paths:
           description: "cannot create user"
         '409':
           description: "username is taken"
+  /far:
+    get:
+      tags:
+      - "FAR"
+      description: "return the league management page Data"
+      parameters:
+        - in: "cookie"
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - in: "cookie"
+          name: type
+          required: true
+          schema:
+            type: string
+            example: "FAR"
+      responses:
+        '200':
+          description: "league management page"
+          content:
+            application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Game'
+  /far/addReport:
+    post:
+      tags:
+        - "game"
+      description: "Add single report."
+      parameters:
+        - in: "cookie"
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - in: "cookie"
+          name: type
+          required: true
+          schema:
+            type: string
+            example: "FAR"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Report"    
+  /far/addGameResult:
+    put:
+      tags:
+      - "game"
+      description: "adding result to a game that have occurred"
+      parameters:
+        - in: "cookie"
+          name: user_id
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - in: "cookie"
+          name: type
+          required: true
+          schema:
+            type: string
+            example: "FAR"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/addGameResult"
+      responses:
+        '201':
+          description: "game updated successfully"
+        '401':
+          description: "game doesn't exist"
   /far/addGame:
     post:
       tags:
@@ -310,7 +390,7 @@ components:
           type: array
           maxLength: 3
           items: 
-            $ref: '#/components/schemas/game' 
+            $ref: '#/components/schemas/Game' 
         leagueMainPage:
           $ref: '#/components/schemas/leagueMainPage'
     leagueMainPage:
@@ -560,41 +640,39 @@ components:
         qualification:
           type: string
           example: "Primary"
-    report:
+    Report:
       type: object
       properties:
-        id:
+        report_id:
           type: integer
           format: int32
           example: 23
-        reportType:
+        game_id:
+          type: integer
+          format: int32
+          example: 4
+        report_type:
           type: string
           enum: ["YELLOW_CARD", "RED_CARD","SUBSITUTE","FOUL","GOAL","OFFSIDE","INJURY"]
           example: "YELLOW_CARD"
-        date:
-          type: string
-          example: "DD/MM/YYYY/HH:MM"
         minute: 
           type: integer
           format: int32
           example: 48
-        player1Name:
+        player1_name:
           type: string
           example: "lukaku"
-        player1ID:
+        player1_id:
           type: number
           format: int32
           example: 20
-        player2Name:
+        player2_name:
           type: string
           example: "cavani"
-        player2ID:
+        player2_id:
           type: number
           format: int32
           example: 21
-        description:
-          type: string
-          example: "free text for explaning the event"
     FavoriteBody:
       type: "object"
       properties:
@@ -689,6 +767,21 @@ components:
           type: array
           items: 
             $ref: '#/components/schemas/Game'
+    addGameResult:
+      type: "object"
+      properties:
+        gameID:
+          type: int
+          format: int32
+          example: 3
+        homeTeamResult:
+          type: int
+          format: int32
+          example: 2
+        awayTeamResult:
+          type: int
+          format: int32
+          example: 3
 
 
 

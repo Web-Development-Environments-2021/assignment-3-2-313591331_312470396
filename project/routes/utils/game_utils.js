@@ -61,8 +61,43 @@ async function markGameAsFavorite(user_id, game_id) {
   );
 }
 
+const addGameResult = async ({gameID,homeTeamScore,awayTeamScore}) => {
+  await DButils.execQuery(
+    `UPDATE Games SET homeScore = ${homeTeamScore}, awayScore = ${awayTeamScore} 
+    WHERE gameID = ${gameID}`
+  );
+  return `game_id ${gameID} result updated successfully
+  homeTeam score ${homeTeamScore} awayTeam score ${awayTeamScore}`
+}
+
+const gelAllGames = async () => {
+  return await DButils.execQuery("SELECT * FROM dbo.Games ");
+}
+
+const addReport = async ({report_type,game_id,minute,player1_name,player1_id,player2_name,player2_id}) => {
+  player2_name ? 
+  await DButils.execQuery(
+    `INSERT INTO dbo.GameReport (report_type,game_id,minute,player1_name,player1_id,player2_name,player2_id) VALUES 
+    ('${report_type}','${game_id}','${minute}','${player1_name}','${player1_id}','${player2_name}','${player2_id}')`) : 
+  await DButils.execQuery(
+    `INSERT INTO dbo.GameReport (report_type,game_id,minute,player1_name,player1_id) VALUES 
+    ('${report_type}','${game_id}','${minute}','${player1_name}','${player1_id}')`)
+}
+
+const getGameReportsForGame = async (game_id) => {
+  return DButils.execQuery(
+    `SELECT * FROM dbo.GameReport WHERE game_id = ${game_id}`
+  )
+}
+
+
+exports.addGameResult = addGameResult
+exports.gelAllGames = gelAllGames
+exports.addReport = addReport
+exports.getGameReportsForGame = getGameReportsForGame
 exports.getGameUtils = getGameUtils;
 exports.getGameByTeam = getGameByTeam
 exports.getGameByStage = getGameByStage
 exports.addGame = addGame;
 exports.markGameAsFavorite = markGameAsFavorite;
+
