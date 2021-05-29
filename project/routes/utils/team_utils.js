@@ -10,7 +10,7 @@ async function getTeamUtils(team_id) {
     },
   });
   team = { ...team.data.data };
-  const player = await player_utils.getPlayersByTeam(team_id)
+  const player = await player_utils.getPlayersByTeam(team_id);
   // const player = "Error";
   const games = await game_utils.getGameByTeam(team_id);
   return {
@@ -21,8 +21,15 @@ async function getTeamUtils(team_id) {
       logo: team.logo_path,
     },
     players: player,
-    upcoming_games: games.filter((game) => !game.gameReportID),
-    previous_games: games.filter((game) => game.gameReportID),
+    upcoming_games: games.filter((game) => new Date(game.date) > currentDate),
+    previous_games: games
+      .filter((game) => new Date(game.date) < currentDate)
+      .map((game) => {
+        return {
+          ...game,
+          gameReport: await game_utils.getGameReport(game.gameID),
+        };
+      }),
   };
 }
 
