@@ -15,6 +15,5 @@ CREATE TABLE dbo.Games
     gameDate DATE NOT NULL,
     homeScore INT ,
     awayScore INT ,
-    gameReportID INT
 );
 GO
