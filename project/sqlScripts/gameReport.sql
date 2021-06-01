@@ -6,13 +6,13 @@ GO
 -- Create the table in the specified schema
 CREATE TABLE dbo.GameReport
 (
-    report_id INT NOT NULL PRIMARY KEY ,
+    report_id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+    report_type [NVARCHAR](50) NOT NULL,
     game_id INT NOT NULL,
     minute INT NOT NULL,
-    player1_name VARCHAR NOT NULL,
+    player1_name [NVARCHAR](50) NOT NULL,
     player1_id INT NOT NULL,
-    player2_name VARCHAR ,
+    player2_name [NVARCHAR](50) ,
     player2_id INT,
-    report_type VARCHAR NOT NULL,
 );
 GO

@@ -2,8 +2,12 @@ const { NText } = require("mssql");
 const DButils = require("./DButils");
 
 async function getGameUtils(game_id) {
-  const gameIds = "(" + game_id.reduce((accumulator,id) => `${accumulator},${id}`) + ")"
-  console.log(gameIds)
+  const gameIds =
+    "(" +
+    game_id.reduce((accumulator, game) => {
+      return `${accumulator},${game}`
+    },0) +
+    ")";
   const gamesData = await DButils.execQuery(
     `SELECT * FROM [dbo].[Games] WHERE gameID IN ${gameIds}`
   );
@@ -51,53 +55,64 @@ async function addGame(
 }
 
 async function markGameAsFavorite(user_id, game_id) {
-  try {
-    await getPlayerUtils(game_id);
-  } catch (error) {
-    throw { status: 404, message: "Game " + game_id + " doesn't exist!" };
+    try {
+    let game = await getGameUtils([game_id]);
+    game = game[0]
+    if (new Date(game.gameDate) < new Date()){
+    throw new Error(`you can't add occurred games to the favorite`)
+    }const a = 0 
+    await DButils.execQuery(
+      `insert into FavoriteGames values ('${user_id}',${game_id})`
+    );
+  }catch(err){
+    console.log(err)
   }
-  DButils.execQuery(
-    `insert into FavoritePlayers values ('${user_id}',${game_id})`
-  );
 }
 
-const addGameResult = async ({gameID,homeTeamScore,awayTeamScore}) => {
+const addGameResult = async ({ gameID, homeTeamScore, awayTeamScore }) => {
   await DButils.execQuery(
     `UPDATE Games SET homeScore = ${homeTeamScore}, awayScore = ${awayTeamScore} 
     WHERE gameID = ${gameID}`
   );
   return `game_id ${gameID} result updated successfully
-  homeTeam score ${homeTeamScore} awayTeam score ${awayTeamScore}`
-}
+  homeTeam score ${homeTeamScore} awayTeam score ${awayTeamScore}`;
+};
 
-const gelAllGames = async () => {
+const getAllGames = async () => {
   return await DButils.execQuery("SELECT * FROM dbo.Games ");
-}
+};
 
-const addReport = async ({report_type,game_id,minute,player1_name,player1_id,player2_name,player2_id}) => {
-  player2_name ? 
-  await DButils.execQuery(
-    `INSERT INTO dbo.GameReport (report_type,game_id,minute,player1_name,player1_id,player2_name,player2_id) VALUES 
-    ('${report_type}','${game_id}','${minute}','${player1_name}','${player1_id}','${player2_name}','${player2_id}')`) : 
-  await DButils.execQuery(
-    `INSERT INTO dbo.GameReport (report_type,game_id,minute,player1_name,player1_id) VALUES 
-    ('${report_type}','${game_id}','${minute}','${player1_name}','${player1_id}')`)
-}
+const addReport = async ({
+  report_type,
+  game_id,
+  minute,
+  player1_name,
+  player1_id,
+  player2_name,
+  player2_id,
+}) => {
+  player2_name
+    ? await DButils.execQuery(
+        `INSERT INTO dbo.GameReport (report_type,game_id,minute,player1_name,player1_id,player2_name,player2_id) VALUES ('${report_type}','${game_id}','${minute}','${player1_name}','${player1_id}','${player2_name}','${player2_id}')`
+      )
+    : await DButils.execQuery(
+        `INSERT INTO dbo.GameReport (report_type,game_id,minute,player1_name,player1_id) VALUES ('${report_type}','${game_id}','${minute}','${player1_name}','${player1_id}')`
+      );
+};
 
 const getGameReportsForGame = async (game_id) => {
-  return DButils.execQuery(
+  const res = await DButils.execQuery(
     `SELECT * FROM dbo.GameReport WHERE game_id = ${game_id}`
-  )
-}
+  );
+  return res;
+};
 
-
-exports.addGameResult = addGameResult
-exports.gelAllGames = gelAllGames
-exports.addReport = addReport
-exports.getGameReportsForGame = getGameReportsForGame
+exports.addGameResult = addGameResult;
+exports.getAllGames = getAllGames;
+exports.addReport = addReport;
+exports.getGameReportsForGame = getGameReportsForGame;
 exports.getGameUtils = getGameUtils;
-exports.getGameByTeam = getGameByTeam
-exports.getGameByStage = getGameByStage
+exports.getGameByTeam = getGameByTeam;
+exports.getGameByStage = getGameByStage;
 exports.addGame = addGame;
 exports.markGameAsFavorite = markGameAsFavorite;
-

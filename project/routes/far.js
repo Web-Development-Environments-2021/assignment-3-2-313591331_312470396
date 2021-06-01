@@ -33,13 +33,14 @@ router.put("/addGameResult", async (req,res,next) => {
     // const {gameID,homeTeamResult,awayTeamResult} = req.body
     res.send(await gameUtils.addGameResult(req.body))
     // res.send({gameID,homeTeamResult,awayTeamResult})
-  }catch(err){res(err)}
+  }catch(err){res.send(err)}
 })
 
 router.post("/addReport", async (req,res,next) => {
   try{
-    res.send(await gameUtils.addReport(req.body))
-  }catch(err){res(err)}
+    await gameUtils.addReport(req.body)
+      res.status(200).send("Success")
+  }catch(err){res.send(err)}
 })
 
 router.post("/addGame", async (req, res, next) => {

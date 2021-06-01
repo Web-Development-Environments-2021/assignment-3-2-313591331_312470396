@@ -31,14 +31,43 @@ router.post("/Favorite", async (req, res, next) => {
 /**
  * This path returns the favorites players that were saved by the logged-in user
  */
-router.get("/FavoritePlayers", async (req, res, next) => {
+router.get("/favoritePlayers", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
-    let favorite_players = {};
     const player_ids = await users_utils.getFavoritePlayers(user_id);
     let player_ids_array = [];
     player_ids.map((element) => player_ids_array.push(element.player_id)); //extracting the players ids into array
     const results = await player_utils.getPlayersInfo(player_ids_array);
+    res.status(200).send(results);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/favoriteGames", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const game_ids = await users_utils.getFavoriteGames(user_id);
+    let games_ids_array = [];
+    game_ids.map((element) => games_ids_array.push(element.game_id)); //extracting the players ids into array
+    //TODO:: check if game_ids is array
+    const currentDate = new Date()
+    let result = await game_utils.getGameUtils(games_ids_array)
+    result = result.filter(game => new Date(game.gameDate) > currentDate)
+    
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/favoriteTeams", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const team_ids = await users_utils.getFavoriteTeams(user_id);
+    let team_ids_array = [];
+    team_ids.map((element) => team_ids_array.push(element.team_id)); //extracting the players ids into array
+    const results = await team_utils.getTeamInfo(team_ids_array);
     res.status(200).send(results);
   } catch (error) {
     next(error);

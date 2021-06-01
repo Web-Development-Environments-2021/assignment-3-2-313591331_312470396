@@ -1,5 +1,7 @@
 var express = require("express");
 var router = express.Router();
+const user_auth = require("../middleware/mid_user");
+
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcryptjs");
 
@@ -53,7 +55,9 @@ router.post("/Login", async (req, res, next) => {
   }
 });
 
-router.get("/logout", function (req, res) {
+
+router.use(user_auth)
+router.post("/logout", function (req, res) {
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
   res.send({ success: true, message: "logout succeeded" });
 });

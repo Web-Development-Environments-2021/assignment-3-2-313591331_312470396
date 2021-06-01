@@ -7,12 +7,13 @@ async function getPlayerUtils(player_id) {
       api_token: process.env.api_token,
     },
   });
+  console.log(player) 
   return {
     preview: {
-      fullname: player.data.data.fullname,
-      team: player.data.data.team_id,
-      image_path: player.data.data.image_path,
-      position_id: player.data.data.position_id,
+      name: player.data.data.fullname,
+      team_name: player.data.data.team_id,
+      image: player.data.data.image_path,
+      position: player.data.data.position_id,
     },
     additional: {
       common_name: player.data.data.common_name,

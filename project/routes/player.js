@@ -5,7 +5,7 @@ const player_utils = require("./utils/player_utils");
 router.get("/:playerID", async (req, res, next) => {
   try {
     const player_details = await player_utils.getPlayerUtils(req.params.playerID);
-    res.send({ ...player_details.preview, ...player_details.additional });
+    res.send(player_details);
   } catch (error) {
     next(error);
   }

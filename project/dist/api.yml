@@ -21,32 +21,23 @@ tags:
     description: Team data
   - name: player
     description: Player data
-  - name: favorite
-    description: Favorites Players, Teams, Games
-  - name: game
-    description: Games data
   - name: stage
     description: Stage Data
+  - name: favorite
+    description: Favorites Players, Teams, Games
   - name: FAR
     description: FootBall Association Representor actions 
 paths:
   /league/:
     get:
+      security:
+        - cookieAuth: []
       tags:
         - "main"
       summary: "main league page"
       operationId: "getMainLeaguePage"
-      parameters:
-        - in: "cookie"
-          name: "user_id"
-          description: "user cookie"
-          required: false
-        - in: "cookie"
-          name: "type"
-          description: "user cookie"
-          required: false
       responses:
-        '200':
+        '201':
           description: "logged user main page"
           content:
             application/json:
@@ -58,29 +49,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/leagueMainPage'
-  /auth/login:
+  /auth/login:  
     post:
-    tags:
+      tags:
         - "auth"
-    summary: "User login into system"
-    operationId: "loginUser"
-    requestBody:
-      description: JSON object for login
-      required: true
-      content:
+      summary: "User login into system"
+      operationId: "loginUser"
+      requestBody:
+        description: "this is the description"
         required: true
-        application/json:
-          schema:
-            $ref: '#/components/schemas/LoginBody'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
       responses:
         '200':
           description: "User login succeed"
-          content:
-            application/json:
+          headers: 
+            Set-Cookie:
+              style: simple
+              explode: false
               schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: "incorrect username or password"
+                type: string
+                example: session=8dsf8esaf65c1xdf3ax2asdcz3asd
+        '401':
+          description: "Username or Password incorrect"
+  /auth/logout:
+    post:
+      security:
+        - cookieAuth: []
+      tags:
+      - "auth"
+      summary: "logout user"
+      description: "logging out a user and deletes his cookie."
+      operationId: "LogOut"
+      responses:
+        '201':
+          description: "User logout succeed"
+        '401':
+          description: "User is already logged out"
   /auth/register:
     post:
       tags:
@@ -97,32 +104,11 @@ paths:
               $ref: '#/components/schemas/RegUser'
       responses:
         '201':
-          description: "User creation succeed"
+          description: "User {userName} created Successfully"
         '401':
           description: "cannot create user"
         '409':
-          description: "username is taken"
-    /auth/logout:
-    get:
-      tags:
-      - "auth"
-      summary: "logout user"
-      description: "logging out a user and deletes his cookie."
-      operationId: "LogOut"
-      parameters:
-        - in: "cookie"
-          name: "user_id"
-          description: "user-logged in id"
-          required: true
-        - in: "cookie"
-          name: "type"
-          description: "user type"
-          required: true
-      responses:
-        '201':
-          description: "User logout succeed"
-        '401':
-          description: "User is already logged out"
+          description: "Username taken"
   /team/{teamID}:
     get:
       tags:
@@ -203,15 +189,12 @@ paths:
           description: "Player not found"
   /users/favorite/:
     post:
+      security:
+        - cookieAuth: []
       tags:
       - "favorite"
       summary: "Add Team,Player or Game to the favorite list"
       operationId: "addToFavorite"
-      parameters:
-        - in: "cookie"
-          name: "user_id"
-          schema:
-            type: string
       requestBody:
         description: JSON object for register
         required: true
@@ -226,21 +209,52 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Element not found"
-  /users/favorite/game: 
+  /users/favoritePlayers: 
     get:
+      security:
+        - cookieAuth: []
+      tags:
+      - "favorite"
+      summary: "Get the favorite Players of user.(Only Players!)"
+      responses:
+        '200':
+          description: "successful operation- players returned"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerPreview'
+        "400":
+          description: "Invalid ID supplied"
+  /users/favoriteTeams: 
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+      - "favorite"
+      summary: "Get the favorite Team of user.(Only Teams!)"
+      responses:
+        '200':
+          description: "successful operation- teams returned"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+        "400":
+          description: "Invalid ID supplied"
+  /users/favoriteGames: 
+    get:
+      security:
+        - cookieAuth: []
       tags:
       - "favorite"
       summary: "Get the favorite Games of user.(Only Games!)"
-      parameters:
-        - in: "cookie"
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            format: int32
       responses:
         '200':
-          description: "successful operation - players returned"
+          description: "successful operation - games returned"
           content:
             application/json:
               schema:
@@ -251,25 +265,13 @@ paths:
           description: "Invalid ID supplied"
   /far/addReferee:
     post:
+      security:
+        - cookieAuth: []
       tags:
-      - "referee"
+      - "FAR"
       summary: "Add a referee"
       description: "Added a user into the referee DB"
       operationId: "addReferee"
-      parameters:
-        - name: user_id
-          in: "cookie"
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - name: type
-          in: "cookie"
-          required: true
-          schema:
-            type: integer
-            format: int32
-            example: "FAR"
       requestBody:
         required: true
         content:
@@ -285,22 +287,11 @@ paths:
           description: "username is taken"
   /far:
     get:
+      security:
+        - cookieAuth: []
       tags:
       - "FAR"
       description: "return the league management page Data"
-      parameters:
-        - in: "cookie"
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - in: "cookie"
-          name: type
-          required: true
-          schema:
-            type: string
-            example: "FAR"
       responses:
         '200':
           description: "league management page"
@@ -310,24 +301,15 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/Game'
+        '401':
+          description: "You Must be a Football Association Representor"
   /far/addReport:
     post:
+      security:
+        - cookieAuth: []
       tags:
-        - "game"
+        - "FAR"
       description: "Add single report."
-      parameters:
-        - in: "cookie"
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - in: "cookie"
-          name: type
-          required: true
-          schema:
-            type: string
-            example: "FAR"
       requestBody:
         content:
           application/json:
@@ -335,22 +317,11 @@ paths:
               $ref: "#/components/schemas/Report"    
   /far/addGameResult:
     put:
+      security:
+        - cookieAuth: []
       tags:
-      - "game"
+      - "FAR"
       description: "adding result to a game that have occurred"
-      parameters:
-        - in: "cookie"
-          name: user_id
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - in: "cookie"
-          name: type
-          required: true
-          schema:
-            type: string
-            example: "FAR"
       requestBody:
         content:
           application/json:
@@ -363,8 +334,10 @@ paths:
           description: "game doesn't exist"
   /far/addGame:
     post:
+      security:
+        - cookieAuth: []
       tags:
-      - "game"
+      - "FAR"
       summary: "Add a game between two 2 teams"
       description: "Add a game into the games DB"
       operationId: "addGame"
@@ -376,22 +349,25 @@ paths:
               $ref: '#/components/schemas/AddGameBody'
       responses:
         '201':
-          description: "User creation succeed"
+          description: "Game added successfully"
         '401':
-          description: "cannot create user"
-        '409':
-          description: "username is taken"
+          description: "cannot create Game"
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      name: session
+      in: cookie
   schemas:
     leagueMainPageUser:
       type: "object"
       properties:
-        favoriteUpcomingGames:
+        upcomingGames:
           type: array
           maxLength: 3
           items: 
             $ref: '#/components/schemas/Game' 
-        leagueMainPage:
+        league_details:
           $ref: '#/components/schemas/leagueMainPage'
     leagueMainPage:
       type: "object"
@@ -403,22 +379,22 @@ components:
           type: integer
           format: int32
           example: 271
-        seasonName:
+        currentSeasonName:
           type: string
           example: "2021/2022"
-        seasonId:
+        currentSeasonId:
           type: integer
           format: int32
           example: 17328
-        stageName:
+        currentStageName:
           type: string
           example: "Champions"
-        stageId:
+        currentStageId:
           type: integer
           format: int32
           example: 7744854
         nextGame:
-          $ref: '#/components/schemas/game'
+          $ref: '#/components/schemas/Game'
     Game:
       type: "object"
       properties:
@@ -466,10 +442,6 @@ components:
           type: integer
           format: int32
           example: 1
-        gameReportID:
-          type: integer
-          format: int32
-          example: 2
     userMainPage:
       type: "object"
       required:
@@ -512,6 +484,7 @@ components:
           type: string
           minLength: 5
           maxLength: 10
+          example: "123456"
         type:
           type: string
           example: "TeamUser"
@@ -576,17 +549,17 @@ components:
     PlayerPreview:
       type: object
       properties:
-        full_name:
+        name:
           type: string
           example: "Neymar da Silva Santos Junior"
-        team:
+        team_name:
           type: string
           example: "PSG"
-        photo:
+        image:
           type: string
           format: url 
           example: "www.photo.com"
-        position_id:
+        position:
           type: integer
           format: int32
           example: 1
