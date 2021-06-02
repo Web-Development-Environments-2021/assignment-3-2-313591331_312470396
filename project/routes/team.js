@@ -15,4 +15,13 @@ router.get("/:teamID", async (req, res, next) => {
   }
 });
 
+router.get("/search/:teamName", async (req, res, next) => {
+  try {
+    const team_details = await team_utils.getTeamByName(req.params.teamName);
+    res.send(team_details);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

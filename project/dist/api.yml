@@ -135,6 +135,29 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Team not found"
+  /team/search/{teamName}:
+    get:
+      tags:
+      - "team"
+      summary: "Find team by Name"
+      description: "Returns a team"
+      operationId: "getTeamByName"
+      parameters:
+        - name: "teamName"
+          in: "path"
+          description: "name of team to search for"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "successful operation player returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamPreview'
+        "400":
+          description: "Invalid name supplied"
   /stage/{stageID}:
     get:
       tags:
@@ -187,6 +210,31 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Player not found"
+  /player/search/{playerName}:
+    get:
+      tags:
+      - "player"
+      summary: "Find player by Name"
+      description: "Returns a single player"
+      operationId: "getPlayerPageByName"
+      parameters:
+        - name: "playerName"
+          in: "path"
+          description: "name of player to search for"
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "successful operation player returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerPreview'
+        "400":
+          description: "Invalid name supplied"
+        "404":
+          description: "Player not found"
   /users/favorite/:
     post:
       security:
@@ -209,6 +257,8 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Element not found"
+        "406":
+          description: "you can't add occurred games to the favorite"
   /users/favoritePlayers: 
     get:
       security:
@@ -263,6 +313,22 @@ paths:
                   $ref: '#/components/schemas/Game'
         "400":
           description: "Invalid ID supplied"
+  /users/getFavoriteGamesPage:
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+      - "favorite"
+      summary: "Get the favorite Games page for user"
+      responses:
+        '200':
+          description: "successful operation - games returned"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/favoriteGamesPage"
+        "400":
+        description: "Invalid ID supplied"
   /far/addReferee:
     post:
       security:
@@ -282,10 +348,12 @@ paths:
         '201':
           description: "Referee add succeed"
         '401':
+          description: "You Must be a Football Association Representor"
+        '402':
           description: "cannot create user"
         '409':
           description: "username is taken"
-  /far:
+  /far: 
     get:
       security:
         - cookieAuth: []
@@ -314,7 +382,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Report"    
+              $ref: "#/components/schemas/Report"
+      responses:
+        '200':
+          description: "Game Report Added successfully"
+        '401':
+          description: "You Must be a Football Association Representor"
+        '402':
+          description: "game doesn't exist"
   /far/addGameResult:
     put:
       security:
@@ -328,9 +403,11 @@ paths:
             schema:
               $ref: "#/components/schemas/addGameResult"
       responses:
-        '201':
+        '200':
           description: "game updated successfully"
         '401':
+          description: "You Must be a Football Association Representor"
+        '402':
           description: "game doesn't exist"
   /far/addGame:
     post:
@@ -351,6 +428,8 @@ paths:
         '201':
           description: "Game added successfully"
         '401':
+          description: "You Must be a Football Association Representor"
+        '402':
           description: "cannot create Game"
 components:
   securitySchemes:
@@ -433,7 +512,7 @@ components:
         gameDate:
           type: string
           format: DATETIME
-          example: "15-11-2021-20:00:00"
+          example: "2021-05-26T00:00:00.00"
         homeScore:
           type: integer
           format: int32
@@ -691,7 +770,7 @@ components:
         gameDate:
           type: string
           format: DATETIME
-          example: "15-11-2021-20:00:00"
+          example: "2021-05-26T00:00:00.000"
     LoginBody:
       type: "object"
       properties:
@@ -747,14 +826,37 @@ components:
           type: int
           format: int32
           example: 3
-        homeTeamResult:
+        homeTeamScore:
           type: int
           format: int32
           example: 2
-        awayTeamResult:
+        awayTeamScore:
           type: int
           format: int32
           example: 3
+    favoriteGamesPage:
+      type: "object"
+      properties:
+        upcoming_games:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Game'
+        previous_games:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Game'
+    TeamPreview:
+      type: "object"
+      properties:
+        id:
+          type: integer
+          example: 101 
+        name:
+          type: string
+          example: "Barcelona"
+        logo:
+          type: string
+          example: "wwww.logoPath.com"
 
 
 

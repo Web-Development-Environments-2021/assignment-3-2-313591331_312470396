@@ -13,13 +13,13 @@ router.post("/Favorite", async (req, res, next) => {
     const favorite_id = req.body.favorite_id;
     switch (favorite_type) {
       case "TEAM":
-        team_utils.markTeamAsFavorite(user_id, favorite_id);
+        await team_utils.markTeamAsFavorite(user_id, favorite_id);
         break;
       case "PLAYER":
-        player_utils.markPlayerAsFavorite(user_id, favorite_id);
+        await player_utils.markPlayerAsFavorite(user_id, favorite_id);
         break;
       case "GAME":
-        game_utils.markGameAsFavorite(user_id, favorite_id);
+        await game_utils.markGameAsFavorite(user_id, favorite_id);
         break;
     }
     res.status(201).send(favorite_type + " successfully saved as favorite");
@@ -67,8 +67,38 @@ router.get("/favoriteTeams", async (req, res, next) => {
     const team_ids = await users_utils.getFavoriteTeams(user_id);
     let team_ids_array = [];
     team_ids.map((element) => team_ids_array.push(element.team_id)); //extracting the players ids into array
-    const results = await team_utils.getTeamInfo(team_ids_array);
+    const results = await team_utils.getTeamsInfo(team_ids_array);
     res.status(200).send(results);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/getFavoriteGamesPage", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const game_ids = await users_utils.getFavoriteGames(user_id);
+    let games_ids_array = [];
+    game_ids.map((element) => games_ids_array.push(element.game_id)); //extracting the players ids into array
+    //TODO:: check if game_ids is array
+    // result = await game_utils.getGamesForFavoritePage(games_ids_array);
+    const currentDate = new Date()
+    let games = await game_utils.getGameUtils(games_ids_array)
+    const result = {
+    upcoming_games: games.filter((game) => new Date(game.gameDate) > currentDate),
+    previous_games: await Promise.all(
+      games
+        .filter((game) => new Date(game.gameDate) < currentDate)
+        .map(async (game) => {
+          return {
+            ...game,
+            gameReport: await game_utils.getGameReportsForGame(game.gameID),
+          };
+        })
+    ),
+    // result = result.filter(game => new Date(game.gameDate) > currentDate)
+      }
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }
