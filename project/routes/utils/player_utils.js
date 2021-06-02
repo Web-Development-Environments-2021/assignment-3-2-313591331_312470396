@@ -58,8 +58,7 @@ async function getPlayersInfo(players_ids_list) {
 
 function extractRelevantPlayerData(players_info) {
   return players_info.map((player_info) => {
-    const a = player_info.data.data;
-    const { fullname, image_path, position_id } = player_info.data.data;
+    const { fullname, image_path, position_id } = player_info
     const { name } = player_info.data.data.team.data;
     return {
       name: fullname,
@@ -80,14 +79,37 @@ async function markPlayerAsFavorite(user_id, player_id) {
   try {
     await getPlayerUtils(player_id);
   } catch (error) {
-    throw { status: 404, message: "Player " + player_id + " doesn't exist!" };
+    throw { status: 404, message: "Player " + player_id + "not found" };
   }
   DButils.execQuery(
     `insert into FavoritePlayers values ('${user_id}',${player_id})`
   );
 }
 
+async function getPlayerByName(player_name) {
+  const player = await axios.get(`${api_domain}/players/search/${player_name}`, {
+    params: {
+      api_token: process.env.api_token,
+    },
+  });
+  return extractRelevantPlayerDataForSearch(player.data.data)
+}
+
+function extractRelevantPlayerDataForSearch(players_info) {
+  return players_info.map((player_info) => {
+    const { fullname, image_path, position_id, team_id} = player_info
+    // const { name } = player_info.data.data.team.data;
+    return {
+      name: fullname,
+      team_name: team_id,
+      image: image_path,
+      position: position_id,
+    };
+  });
+}
+
 exports.getPlayersByTeam = getPlayersByTeam;
 exports.getPlayersInfo = getPlayersInfo;
 exports.getPlayerUtils = getPlayerUtils;
 exports.markPlayerAsFavorite = markPlayerAsFavorite;
+exports.getPlayerByName = getPlayerByName;

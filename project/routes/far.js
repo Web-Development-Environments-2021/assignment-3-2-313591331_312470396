@@ -6,7 +6,8 @@ const far_auth = require("../middleware/mid_FAR");
 router.use(far_auth);
 router.get("/", async (req, res, next) => {
   try{
-    res.send( await gameUtils.gelAllGames())
+    const games = await gameUtils.getAllGames()
+    res.send(games)
   }catch(err){
     res.send(err)
   }
@@ -33,13 +34,13 @@ router.put("/addGameResult", async (req,res,next) => {
     // const {gameID,homeTeamResult,awayTeamResult} = req.body
     res.send(await gameUtils.addGameResult(req.body))
     // res.send({gameID,homeTeamResult,awayTeamResult})
-  }catch(err){res.send(err)}
+  }catch(err){res.status(err.status).send(err.message)}
 })
 
 router.post("/addReport", async (req,res,next) => {
   try{
     await gameUtils.addReport(req.body)
-      res.status(200).send("Success")
+      res.status(200).send("Game Report Added successfully")
   }catch(err){res.send(err)}
 })
 
@@ -53,6 +54,12 @@ router.post("/addGame", async (req, res, next) => {
     const homeTeamID = req.body.homeTeamID;
     const awayTeamID = req.body.awayTeamID;
     const gameDate = req.body.gameDate;
+
+    // const currentDate = new Date(); 
+    // const gameAsDate = new Date ()
+    if (new Date() > new Date(gameDate))
+    throw { status: 402, message: "cannot create Game" };
+
     // might be undefined. Handled in the game-util.
     await gameUtils.addGame(
       leagueID,

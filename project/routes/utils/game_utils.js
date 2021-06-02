@@ -59,24 +59,29 @@ async function markGameAsFavorite(user_id, game_id) {
     let game = await getGameUtils([game_id]);
     game = game[0]
     if (new Date(game.gameDate) < new Date()){
-    throw new Error(`you can't add occurred games to the favorite`)
+    throw  {status:406,message:`you can't add occurred games to the favorite`}
     }const a = 0 
     await DButils.execQuery(
       `insert into FavoriteGames values ('${user_id}',${game_id})`
     );
   }catch(err){
-    console.log(err)
+    if (err.status === 406) throw err
+    throw {status: 404, message: `${game_id} not found`};
   }
 }
 
 const addGameResult = async ({ gameID, homeTeamScore, awayTeamScore }) => {
+  
+  const game = await DButils.execQuery( `SELECT * from Games WHERE gameID = ${gameID}`)
+  if (game.length < 1){
+  throw { status: 401, message: "game doesn't exist"}};
   await DButils.execQuery(
     `UPDATE Games SET homeScore = ${homeTeamScore}, awayScore = ${awayTeamScore} 
     WHERE gameID = ${gameID}`
   );
-  return `game_id ${gameID} result updated successfully
-  homeTeam score ${homeTeamScore} awayTeam score ${awayTeamScore}`;
-};
+  return "game updated successfully"
+}
+
 
 const getAllGames = async () => {
   return await DButils.execQuery("SELECT * FROM dbo.Games ");

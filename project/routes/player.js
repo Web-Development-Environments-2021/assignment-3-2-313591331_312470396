@@ -11,4 +11,13 @@ router.get("/:playerID", async (req, res, next) => {
   }
 });
 
+router.get("/search/:playerName", async (req, res, next) => {
+  try {
+    const player_details = await player_utils.getPlayerByName(req.params.playerName);
+    res.send(player_details);
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

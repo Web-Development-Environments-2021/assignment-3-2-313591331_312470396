@@ -49,7 +49,7 @@ router.post("/Login", async (req, res, next) => {
     req.session.type = user.type;
 
     // return cookie
-    res.status(200).send("login succeeded");
+    res.status(200).send("User login succeeded");
   } catch (error) {
     next(error);
   }
@@ -59,7 +59,7 @@ router.post("/Login", async (req, res, next) => {
 router.use(user_auth)
 router.post("/logout", function (req, res) {
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
-  res.send({ success: true, message: "logout succeeded" });
+  res.status(201).send("user logout succeeded" );
 });
 
 module.exports = router;
