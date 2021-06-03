@@ -7,7 +7,7 @@ async function getPlayerUtils(player_id) {
       api_token: process.env.api_token,
     },
   });
-  console.log(player) 
+  console.log(player);
   return {
     preview: {
       name: player.data.data.fullname,
@@ -57,16 +57,20 @@ async function getPlayersInfo(players_ids_list) {
 }
 
 function extractRelevantPlayerData(players_info) {
-  return players_info.map((player_info) => {
-    const { fullname, image_path, position_id } = player_info
+  const playersData = [];
+  players_info.map((player_info) => {
+    if (
+      player_info.data != null &&
+      player_info.data.error != null &&
+      player_info.data.error.code == 429
+    ) {
+      throw { status: 429, message: "Out of tokens in SportMonks API." };
+    }
+    const { fullname, image_path, position_id } = player_info;
     const { name } = player_info.data.data.team.data;
-    return {
-      name: fullname,
-      image: image_path,
-      position: position_id,
-      team_name: name,
-    };
+    playersData.push({ fullname, image_path, position_id, name });
   });
+  return playersData;
 }
 
 async function getPlayersByTeam(team_id) {
@@ -87,17 +91,20 @@ async function markPlayerAsFavorite(user_id, player_id) {
 }
 
 async function getPlayerByName(player_name) {
-  const player = await axios.get(`${api_domain}/players/search/${player_name}`, {
-    params: {
-      api_token: process.env.api_token,
-    },
-  });
-  return extractRelevantPlayerDataForSearch(player.data.data)
+  const player = await axios.get(
+    `${api_domain}/players/search/${player_name}`,
+    {
+      params: {
+        api_token: process.env.api_token,
+      },
+    }
+  );
+  return extractRelevantPlayerDataForSearch(player.data.data);
 }
 
 function extractRelevantPlayerDataForSearch(players_info) {
   return players_info.map((player_info) => {
-    const { fullname, image_path, position_id, team_id} = player_info
+    const { fullname, image_path, position_id, team_id } = player_info;
     // const { name } = player_info.data.data.team.data;
     return {
       name: fullname,

@@ -135,6 +135,8 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Team not found"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /team/search/{teamName}:
     get:
       tags:
@@ -158,6 +160,8 @@ paths:
                 $ref: '#/components/schemas/TeamPreview'
         "400":
           description: "Invalid name supplied"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /stage/{stageID}:
     get:
       tags:
@@ -184,6 +188,8 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "stage not found"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /player/{playerID}:
     get:
       tags:
@@ -210,6 +216,8 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Player not found"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /player/search/{playerName}:
     get:
       tags:
@@ -235,6 +243,8 @@ paths:
           description: "Invalid name supplied"
         "404":
           description: "Player not found"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /users/favorite/:
     post:
       security:
@@ -259,6 +269,8 @@ paths:
           description: "Element not found"
         "406":
           description: "you can't add occurred games to the favorite"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /users/favoritePlayers: 
     get:
       security:
@@ -277,6 +289,8 @@ paths:
                   $ref: '#/components/schemas/PlayerPreview'
         "400":
           description: "Invalid ID supplied"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /users/favoriteTeams: 
     get:
       security:
@@ -295,6 +309,8 @@ paths:
                   $ref: '#/components/schemas/Team'
         "400":
           description: "Invalid ID supplied"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /users/favoriteGames: 
     get:
       security:
@@ -313,6 +329,8 @@ paths:
                   $ref: '#/components/schemas/Game'
         "400":
           description: "Invalid ID supplied"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /users/getFavoriteGamesPage:
     get:
       security:
@@ -328,7 +346,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/favoriteGamesPage"
         "400":
-        description: "Invalid ID supplied"
+          description: "Invalid ID supplied"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /far/addReferee:
     post:
       security:
@@ -353,6 +373,8 @@ paths:
           description: "cannot create user"
         '409':
           description: "username is taken"
+        "429":
+          description: "Out of tokens in SportMonks API"
   /far: 
     get:
       security:
@@ -371,6 +393,7 @@ paths:
                     $ref: '#/components/schemas/Game'
         '401':
           description: "You Must be a Football Association Representor"
+          
   /far/addReport:
     post:
       security:

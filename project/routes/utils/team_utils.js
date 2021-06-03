@@ -4,7 +4,6 @@ const DButils = require("./DButils");
 const player_utils = require("./player_utils");
 const game_utils = require("./game_utils");
 async function getTeamUtils(team_id) {
-  
   let team = await axios.get(`${api_domain}/teams/${team_id}`, {
     params: {
       api_token: process.env.api_token,
@@ -15,7 +14,7 @@ async function getTeamUtils(team_id) {
   // const player = "Error";
   const games = await game_utils.getGameByTeam(team_id);
   // const dummyReport = await  game_utils.getGameReportsForGame(3)
-  const currentDate = new Date()
+  const currentDate = new Date();
   const result = {
     teamPreview: {
       id: team.id,
@@ -24,11 +23,13 @@ async function getTeamUtils(team_id) {
       logo: team.logo_path,
     },
     players: player,
-    upcoming_games: games.filter((game) => new Date(game.gameDate) > currentDate),
+    upcoming_games: games.filter(
+      (game) => new Date(game.gameDate) > currentDate
+    ),
     previous_games: await Promise.all(
       games
         .filter((game) => new Date(game.gameDate) < currentDate)
-        .map( async (game) => {
+        .map(async (game) => {
           return {
             ...game,
             gameReport: await game_utils.getGameReportsForGame(game.gameID),
@@ -36,7 +37,7 @@ async function getTeamUtils(team_id) {
         })
     ),
   };
-  return result
+  return result;
 }
 
 async function getTeamsInfo(teams_ids_list) {
@@ -55,6 +56,7 @@ async function getTeamsInfo(teams_ids_list) {
 }
 
 function extractRelevantTeamData(teams_info) {
+  const allplayers = [];
   return teams_info.map((team_info) => {
     const a = team_info.data.data;
     const { id, name, short_code, logo_path } = team_info.data.data;
@@ -68,14 +70,13 @@ function extractRelevantTeamData(teams_info) {
 }
 
 async function markTeamAsFavorite(user_id, team_id) {
-  try{
-  const team = await getTeamUtils(team_id);
-  if (!team)
-
-    
-  DButils.execQuery(
-    `insert into FavoriteTeams values ('${user_id}',${team_id})`
-  );}catch(err){
+  try {
+    const team = await getTeamUtils(team_id);
+    if (!team)
+      DButils.execQuery(
+        `insert into FavoriteTeams values ('${user_id}',${team_id})`
+      );
+  } catch (err) {
     throw { status: 404, message: "Team " + team_id + " doesn't exist!" };
   }
 }
@@ -86,16 +87,16 @@ async function getTeamByName(team_name) {
       api_token: process.env.api_token,
     },
   });
-  return extractRelevantTeamDataForSearch(teams.data.data)
+  return extractRelevantTeamDataForSearch(teams.data.data);
 }
 
 function extractRelevantTeamDataForSearch(teams_info) {
   return teams_info.map((team_info) => {
-    const { id, name, logo_path} = team_info
+    const { id, name, logo_path } = team_info;
     return {
       id,
       name,
-      logo:logo_path,
+      logo: logo_path,
     };
   });
 }
