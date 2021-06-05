@@ -1,4 +1,3 @@
-//#region global imports
 const DButils = require("./routes/utils/DButils");
 const axios = require("axios");
 const bcrypt = require("bcryptjs");

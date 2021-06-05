@@ -440,7 +440,7 @@ paths:
           description: "Game added successfully"
         '401':
           description: "You Must be a Football Association Representor"
-        '402':
+        '403':
           description: "Can't create game,that his date has passed.Choose another date"
   /search/team/{teamName}:
     get:
@@ -676,7 +676,7 @@ components:
           example: "Eden2410!"
         type:
           type: string
-          example: "TeamUser"
+          example: "FAN/TEAMUSER/FAR"
     User:
       type: "object"
       properties:
@@ -809,10 +809,6 @@ components:
     Report:
       type: object
       properties:
-        report_id:
-          type: integer
-          format: int32
-          example: 23
         game_id:
           type: integer
           format: int32
@@ -893,7 +889,7 @@ components:
           example: "EdenRef"
         password:
           type: string
-          example: "2410!e"
+          example: "Eden2410!"
     playerPage:
       type: "object"
       properties:

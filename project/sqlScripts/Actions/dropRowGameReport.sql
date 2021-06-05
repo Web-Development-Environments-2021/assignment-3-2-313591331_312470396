@@ -1,0 +1,1 @@
+DELETE FROM GameReport WHERE report_id=15 OR report_id=16

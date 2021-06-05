@@ -1,3 +1,0 @@
-SELECT TOP (1000) *
-  FROM  [dbo].[Games]
-  WHERE gameID IN (1,2,3)
