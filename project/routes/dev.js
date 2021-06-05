@@ -32,7 +32,6 @@ router.get("/favoritePlayersTable", async (req, res, next) => {
     const result = await DButils.execQuery(
       "SELECT * FROM dbo.FavoritePlayers "
     );
-    console.log(result);
     res.status(200).send(result);
   } catch (error) {
     next(error);
@@ -41,9 +40,7 @@ router.get("/favoritePlayersTable", async (req, res, next) => {
 
 router.get("/favoriteGamesTable", async (req, res, next) => {
   try {
-    const result = await DButils.execQuery(
-      "SELECT * FROM dbo.FavoriteGames "
-    );
+    const result = await DButils.execQuery("SELECT * FROM dbo.FavoriteGames ");
     console.log(result);
     res.status(200).send(result);
   } catch (error) {

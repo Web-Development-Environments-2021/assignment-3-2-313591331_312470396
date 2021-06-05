@@ -54,7 +54,6 @@ app.get("/alive", (req, res) => res.send("I'm alive"));
 // Routings
 app.use("/users", users);
 app.use("/team", team);
-app.use("/dev", dev);
 app.use("/coach", coach);
 app.use("/player", player);
 app.use("/far", far);
@@ -71,9 +70,3 @@ app.use(function (err, req, res, next) {
 const server = app.listen(port, () => {
   console.log(`Server listen on port ${port}`);
 });
-
-// process.on("SIGINT", function () {
-//   if (server) {
-//     server.close(() => console.log("server closed"));
-//   }
-// });

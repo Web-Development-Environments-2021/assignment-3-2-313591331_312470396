@@ -176,3 +176,4 @@ exports.markGameAsFavorite = markGameAsFavorite;
 exports.filterUpcomingGames = filterUpcomingGames;
 exports.filterPreviousGames = filterPreviousGames;
 exports.unmarkGameAsFavorite = unmarkGameAsFavorite;
+exports.getGameUtils = getGameUtils;

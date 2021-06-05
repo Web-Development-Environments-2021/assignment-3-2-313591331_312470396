@@ -26,7 +26,6 @@ router.get("/", async (req, res, next) => {
     const game_ids = await users_utils.getFavoriteGames(req.session.user_id);
     let games_ids_array = [];
     game_ids.map((element) => games_ids_array.push(element.game_id)); //extracting the game ids into array
-    //TODO:: check if game_ids is array
     let upcomingGames = await game_utils.getGameUtils(games_ids_array);
     upcomingGames = game_utils.filterUpcomingGames(upcomingGames);
     if (upcomingGames.length > 3) {

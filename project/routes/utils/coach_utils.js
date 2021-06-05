@@ -33,4 +33,3 @@ async function getCoachByTeam(team_id) {
   return team.data.data.coach.data;
 }
 exports.getCoachUtils = getCoachUtils;
-exports.getCoachByTeam = getCoachByTeam;

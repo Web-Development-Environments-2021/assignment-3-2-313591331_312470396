@@ -31,9 +31,7 @@ router.post("/addReferee", async (req, res, next) => {
 
 router.put("/updateGameResult", async (req, res, next) => {
   try {
-    // const {gameID,homeTeamResult,awayTeamResult} = req.body
     res.send(await gameUtils.updateGameResult(req.body));
-    // res.send({gameID,homeTeamResult,awayTeamResult})
   } catch (err) {
     res.status(err.status).send(err.message);
   }
@@ -60,9 +58,6 @@ router.post("/addGame", async (req, res, next) => {
     const homeTeamID = req.body.homeTeamID;
     const awayTeamID = req.body.awayTeamID;
     const gameDate = req.body.gameDate;
-
-    // const currentDate = new Date();
-    // const gameAsDate = new Date ()
     if (new Date() > new Date(gameDate))
       throw {
         status: 402,

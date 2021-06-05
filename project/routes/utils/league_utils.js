@@ -1,6 +1,5 @@
 const axios = require("axios");
 const LEAGUE_ID = 271;
-const stage_utils = require("./stage_utils");
 const game_utils = require("./game_utils");
 
 async function getLeagueDetails() {
@@ -27,7 +26,6 @@ async function getLeagueDetails() {
     console.log("Stage Id not updated in the DB");
     stage = { data: { data: { name: "null", id: 467 } } };
   }
-  // const games = await game_utils.getAllGames();
   const games = await game_utils.getAllGamesFiltered(
     LEAGUE_ID,
     league.data.data.season.data.id,
@@ -41,8 +39,7 @@ async function getLeagueDetails() {
     currentSeasonId: league.data.data.season.data.id,
     currentStageName: stage.data.data.name,
     currentStageId: stage.data.data.id,
-    upcomingGame: upcomingGamesArray[0], //change to games from DB
-    // next game details should come from DB
+    upcomingGame: upcomingGamesArray[0],
   };
 }
 
