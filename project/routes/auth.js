@@ -55,11 +55,12 @@ router.post("/Login", async (req, res, next) => {
   }
 });
 
-
-router.use(user_auth)
 router.post("/logout", function (req, res) {
+  if (req.session && !req.session.user_id) {
+    throw { status: 401, message: "You must be logged in to do: logout" };
+  }
   req.session.reset(); // reset the session info --> send cookie when  req.session == undefined!!
-  res.status(201).send("user logout succeeded" );
+  res.status(201).send("user logout succeeded");
 });
 
 module.exports = router;

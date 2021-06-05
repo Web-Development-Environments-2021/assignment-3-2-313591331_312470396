@@ -37,7 +37,6 @@ const corsConfig = {
 };
 app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
-
 const port = process.env.PORT || "3000";
 const auth = require("./routes/auth");
 const users = require("./routes/users");
@@ -49,8 +48,8 @@ const player = require("./routes/player");
 const far = require("./routes/far");
 const game = require("./routes/game");
 const stage = require("./routes/stage");
+const search = require("./routes/search");
 //#endregion
-// ----> For cheking that our server is alive
 app.get("/alive", (req, res) => res.send("I'm alive"));
 // Routings
 app.use("/users", users);
@@ -63,6 +62,7 @@ app.use("/auth", auth);
 app.use("/league", league);
 app.use("/game", game);
 app.use("/stage", stage);
+app.use("/search", search);
 app.use(function (err, req, res, next) {
   console.error(err);
   res.status(err.status || 500).send(err.message);

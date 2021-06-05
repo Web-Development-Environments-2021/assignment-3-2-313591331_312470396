@@ -3,39 +3,42 @@ const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const DButils = require("./DButils");
 const player_utils = require("./player_utils");
 const game_utils = require("./game_utils");
-async function getTeamUtils(team_id) {
+
+async function validTeamExist(team_id) {
   let team = await axios.get(`${api_domain}/teams/${team_id}`, {
     params: {
       api_token: process.env.api_token,
     },
   });
+}
+
+async function getTeamUtils(team_id) {
+  let team = await axios.get(`${api_domain}/teams/${team_id}`, {
+    params: {
+      api_token: process.env.api_token,
+      include: "coach",
+    },
+  });
   team = { ...team.data.data };
-  const player = await player_utils.getPlayersByTeam(team_id);
+  const players = await player_utils.getPlayersByTeam(team_id);
   // const player = "Error";
   const games = await game_utils.getGameByTeam(team_id);
   // const dummyReport = await  game_utils.getGameReportsForGame(3)
-  const currentDate = new Date();
+  previous_games = await game_utils.filterPreviousGames(games);
   const result = {
     teamPreview: {
       id: team.id,
       name: team.name,
       shortCode: team.short_code,
       logo: team.logo_path,
+      coach_id: team.coach.data.coach_id,
+      coach_fullname: team.coach.data.fullname,
     },
-    players: player,
-    upcoming_games: games.filter(
-      (game) => new Date(game.gameDate) > currentDate
-    ),
-    previous_games: await Promise.all(
-      games
-        .filter((game) => new Date(game.gameDate) < currentDate)
-        .map(async (game) => {
-          return {
-            ...game,
-            gameReport: await game_utils.getGameReportsForGame(game.gameID),
-          };
-        })
-    ),
+    players: players,
+    games: {
+      upcoming_games: game_utils.filterUpcomingGames(games),
+      previous_games: previous_games,
+    },
   };
   return result;
 }
@@ -70,15 +73,29 @@ function extractRelevantTeamData(teams_info) {
 }
 
 async function markTeamAsFavorite(user_id, team_id) {
-  try {
-    const team = await getTeamUtils(team_id);
-    if (!team)
-      DButils.execQuery(
-        `insert into FavoriteTeams values ('${user_id}',${team_id})`
-      );
-  } catch (err) {
-    throw { status: 404, message: "Team " + team_id + " doesn't exist!" };
+  await validTeamExist(team_id).catch((err) => {
+    throw { status: 404, message: "Team not found" };
+  });
+  await DButils.execQuery(
+    `insert into FavoriteTeams values ('${user_id}',${team_id})`
+  ).catch((err) => {
+    throw { status: 408, message: "Team already in your favorite list" };
+  });
+}
+
+async function unmarkTeamAsFavorite(user_id, team_id) {
+  await validTeamExist(team_id).catch((err) => {
+    throw { status: 404, message: "Team not found" };
+  });
+  const res = await DButils.execQuery(
+    `Select * FROM FavoriteTeams WHERE (user_id ='${user_id}' AND team_id = '${team_id}')`
+  );
+  if (res.length === 0) {
+    throw { status: 408, message: "Team wasn't in your favorite list" };
   }
+  await DButils.execQuery(
+    `DELETE FROM FavoriteTeams WHERE (user_id ='${user_id}' AND team_id = '${team_id}')`
+  );
 }
 
 async function getTeamByName(team_name) {
@@ -87,7 +104,11 @@ async function getTeamByName(team_name) {
       api_token: process.env.api_token,
     },
   });
-  return extractRelevantTeamDataForSearch(teams.data.data);
+  if (teams.data.data.length > 0)
+    return extractRelevantTeamDataForSearch(teams.data.data);
+  else {
+    throw { status: 404, message: "Team: " + team_name + " not found." };
+  }
 }
 
 function extractRelevantTeamDataForSearch(teams_info) {
@@ -106,3 +127,5 @@ exports.getTeamsInfo = getTeamsInfo;
 exports.markTeamAsFavorite = markTeamAsFavorite;
 exports.extractRelevantTeamDataForSearch = extractRelevantTeamDataForSearch;
 exports.getTeamByName = getTeamByName;
+exports.validTeamExist = validTeamExist;
+exports.unmarkTeamAsFavorite = unmarkTeamAsFavorite;

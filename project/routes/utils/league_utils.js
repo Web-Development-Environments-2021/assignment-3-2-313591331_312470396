@@ -1,7 +1,7 @@
 const axios = require("axios");
 const LEAGUE_ID = 271;
-const stage_utils = require("./stage_utils")
-const game_utils = require('./game_utils')
+const stage_utils = require("./stage_utils");
+const game_utils = require("./game_utils");
 
 async function getLeagueDetails() {
   const league = await axios.get(
@@ -13,21 +13,27 @@ async function getLeagueDetails() {
       },
     }
   );
-  try{
-  const stage = await axios.get(
-    `https://soccer.sportmonks.com/api/v2.0/stages/${league.data.data.current_stage_id}`,
-    {
-      params: {
-        api_token: process.env.api_token,
-      },
-    }
+  let stage;
+  try {
+    stage = await axios.get(
+      `https://soccer.sportmonks.com/api/v2.0/stages/${league.data.data.current_stage_id}`,
+      {
+        params: {
+          api_token: process.env.api_token,
+        },
+      }
+    );
+  } catch (err) {
+    console.log("Stage Id not updated in the DB");
+    stage = { data: { data: { name: "null", id: 467 } } };
+  }
+  // const games = await game_utils.getAllGames();
+  const games = await game_utils.getAllGamesFiltered(
+    LEAGUE_ID,
+    league.data.data.season.data.id,
+    stage.data.data.id
   );
-}catch(err){
-  // const stage = {data:{data:{name:"null",id:467}}}
-}
-const stage = {data:{data:{name:"null",id:467}}} //
-  const games = await game_utils.getAllGames();
-  const upcomingGamesArray = games
+  const upcomingGamesArray = game_utils.filterUpcomingGames(games);
   return {
     leagueName: league.data.data.name,
     leagueID: league.data.data.id,
@@ -35,8 +41,9 @@ const stage = {data:{data:{name:"null",id:467}}} //
     currentSeasonId: league.data.data.season.data.id,
     currentStageName: stage.data.data.name,
     currentStageId: stage.data.data.id,
-    upcomingGame:upcomingGamesArray[upcomingGamesArray.length-1], //change to games from DB
+    upcomingGame: upcomingGamesArray[0], //change to games from DB
     // next game details should come from DB
   };
 }
+
 exports.getLeagueDetails = getLeagueDetails;

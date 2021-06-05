@@ -7,17 +7,8 @@ const getStagePage = async (stage_id) => {
   const currentDate = new Date();
   return {
     stageID: stage_id,
-    upcoming_games: games.filter((game) => new Date(game.gameDate) > currentDate),
-    previous_games: await Promise.all(
-      games
-        .filter((game) => new Date(game.gameDate) < currentDate)
-        .map(async (game) => {
-          return {
-            ...game,
-            gameReport: await game_utils.getGameReportsForGame(game.gameID),
-          };
-        })
-    ),
+    upcoming_games: game_utils.filterUpcomingGames(games),
+    previous_games: await game_utils.filterPreviousGames(games),
   };
 };
 
