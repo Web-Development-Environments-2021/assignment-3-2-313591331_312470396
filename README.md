@@ -31,7 +31,7 @@ To run the server on your local environment:
 
 6.now you can test the endpoints using client side such as localhost:3000/api swagger ui, or postman collection.
 
-###### To use our DB and SportMonks credentials use:
+### To use our DB and SportMonks credentials use:
 * Azure DB
   * tedious_userName=footballnew
   * tedious_password=25101511eb!
@@ -58,3 +58,11 @@ COOKIE_SECRET=24101511
 api_token=L3DPWF84GYDfShDGEffKIbURjPQnBVoVZICj468fDmWiHtwtCE5NWroOxdCg
 
 bcrypt_saltRounds=13
+
+### About the code:
+* We accomplished the *bonus* section.
+* To test you must have login as the Football Association Representor credentials which are:
+  *  username: EdenBer
+  *  password: Eden2410!
+* The DB contains some Dummy data, you more than welcome to go and insert your games, game reports, choose your favorites, and imply all the functionality the app expose.
+* 
