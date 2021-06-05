@@ -58,12 +58,12 @@ router.post("/addGame", async (req, res, next) => {
     const homeTeamID = req.body.homeTeamID;
     const awayTeamID = req.body.awayTeamID;
     const gameDate = req.body.gameDate;
-    if (new Date() > new Date(gameDate))
-      throw {
-        status: 402,
-        message:
-          "Can't create game,that his date has passed.Choose another date",
-      };
+    // if (new Date() > new Date(gameDate))
+    //   throw {
+    //     status: 403,
+    //     message:
+    //       "Can't create game,that his date has passed.Choose another date",
+    //   };
 
     // might be undefined. Handled in the game-util.
     await gameUtils.addGame(

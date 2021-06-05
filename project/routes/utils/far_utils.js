@@ -8,8 +8,11 @@ async function addRefereeUtils(user_id, qualification) {
   if (user === undefined) {
     throw { status: 420, message: "There is no such user " };
   }
-  if (user.type !== "Fan") {
-    throw { status: 409, message: "user already has type of: " + user.type };
+  if (user.type !== "FAN") {
+    throw {
+      status: 409,
+      message: "user already has type of: " + user.type + " Must be FAN",
+    };
   }
   await DButils.execQuery(
     `INSERT INTO dbo.Referees (user_id,qualification) VALUES ('${user_id}','${qualification}')`
