@@ -4,14 +4,6 @@ const DButils = require("./DButils");
 const player_utils = require("./player_utils");
 const game_utils = require("./game_utils");
 
-async function validTeamExist(team_id) {
-  let team = await axios.get(`${api_domain}/teams/${team_id}`, {
-    params: {
-      api_token: process.env.api_token,
-    },
-  });
-}
-
 async function getTeamUtils(team_id) {
   let team = await axios.get(`${api_domain}/teams/${team_id}`, {
     params: {
@@ -21,9 +13,7 @@ async function getTeamUtils(team_id) {
   });
   team = { ...team.data.data };
   const players = await player_utils.getPlayersByTeam(team_id);
-  // const player = "Error";
   const games = await game_utils.getGameByTeam(team_id);
-  // const dummyReport = await  game_utils.getGameReportsForGame(3)
   previous_games = await game_utils.filterPreviousGames(games);
   const result = {
     teamPreview: {
@@ -59,9 +49,7 @@ async function getTeamsInfo(teams_ids_list) {
 }
 
 function extractRelevantTeamData(teams_info) {
-  const allplayers = [];
   return teams_info.map((team_info) => {
-    const a = team_info.data.data;
     const { id, name, short_code, logo_path } = team_info.data.data;
     return {
       id,
@@ -73,7 +61,7 @@ function extractRelevantTeamData(teams_info) {
 }
 
 async function markTeamAsFavorite(user_id, team_id) {
-  await validTeamExist(team_id).catch((err) => {
+  await helperValidTeamExist(team_id).catch((err) => {
     throw { status: 404, message: "Team not found" };
   });
   await DButils.execQuery(
@@ -84,7 +72,7 @@ async function markTeamAsFavorite(user_id, team_id) {
 }
 
 async function unmarkTeamAsFavorite(user_id, team_id) {
-  await validTeamExist(team_id).catch((err) => {
+  await helperValidTeamExist(team_id).catch((err) => {
     throw { status: 404, message: "Team not found" };
   });
   const res = await DButils.execQuery(
@@ -121,11 +109,17 @@ function extractRelevantTeamDataForSearch(teams_info) {
     };
   });
 }
-
+async function helperValidTeamExist(team_id) {
+  //If there is no team, An excpetion will be throned.
+  let team = await axios.get(`${api_domain}/teams/${team_id}`, {
+    params: {
+      api_token: process.env.api_token,
+    },
+  });
+}
 exports.getTeamUtils = getTeamUtils;
 exports.getTeamsInfo = getTeamsInfo;
 exports.markTeamAsFavorite = markTeamAsFavorite;
 exports.extractRelevantTeamDataForSearch = extractRelevantTeamDataForSearch;
 exports.getTeamByName = getTeamByName;
-exports.validTeamExist = validTeamExist;
 exports.unmarkTeamAsFavorite = unmarkTeamAsFavorite;

@@ -87,8 +87,7 @@ router.get("/favoriteGames", async (req, res, next) => {
     const user_id = req.session.user_id;
     const game_ids = await users_utils.getFavoriteGames(user_id);
     let games_ids_array = [];
-    game_ids.map((element) => games_ids_array.push(element.game_id)); //extracting the players ids into array
-    //TODO:: check if game_ids is array
+    game_ids.map((element) => games_ids_array.push(element.game_id));
     const currentDate = new Date();
     let result = await game_utils.getGameUtils(games_ids_array);
     result = result.filter((game) => new Date(game.gameDate) > currentDate);
@@ -118,8 +117,6 @@ router.get("/getFavoriteGamesPage", async (req, res, next) => {
     const game_ids = await users_utils.getFavoriteGames(user_id);
     let games_ids_array = [];
     game_ids.map((element) => games_ids_array.push(element.game_id)); //extracting the players ids into array
-    //TODO:: check if game_ids is array
-    // result = await game_utils.getGamesForFavoritePage(games_ids_array);
     const currentDate = new Date();
     let games = await game_utils.getGameUtils(games_ids_array);
     const result = {
@@ -136,7 +133,6 @@ router.get("/getFavoriteGamesPage", async (req, res, next) => {
             };
           })
       ),
-      // result = result.filter(game => new Date(game.gameDate) > currentDate)
     };
     res.status(200).send(result);
   } catch (error) {
