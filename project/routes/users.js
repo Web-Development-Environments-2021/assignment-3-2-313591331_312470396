@@ -37,8 +37,8 @@ router.post("/Favorite", async (req, res, next) => {
 router.delete("/Favorite", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
-    const favorite_type = req.body.favorite_type;
-    const favorite_id = req.body.favorite_id;
+    const favorite_type = req.query.favorite_type;
+    const favorite_id = req.query.favorite_id;
     switch (favorite_type) {
       case "TEAM":
         await team_utils.unmarkTeamAsFavorite(user_id, favorite_id);

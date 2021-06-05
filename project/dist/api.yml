@@ -198,7 +198,6 @@ paths:
           description: "Player not found"
         "429":
           description: "Out of tokens in SportMonks API"
-  
   /users/favorite/:
     post:
       security:
@@ -227,10 +226,9 @@ paths:
           description: "Element already in your favorite list"
         "410":
           description: "No such type: element must be TEAM/PLAYER/GAME"
-          example: "No such type: Team must be TEAM/PLAYER/GAME"
+          # example: "No such type: Team must be TEAM/PLAYER/GAME"
         "429":
           description: "Out of tokens in SportMonks API"
-    /users/favorite/:
     delete:
       security:
         - cookieAuth: []
@@ -238,13 +236,22 @@ paths:
       - "favorite"
       summary: "Remove Team,Player or Game to the favorite list"
       operationId: "RemoveFromFavorite"
-      requestBody:
-        description: JSON object for register
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FavoriteBody'
+      parameters:
+        - name: "favorite_type"
+          in: "query"
+          description: "TEAM/PLAYER/GAME"
+          required: false
+          schema:
+            type: string
+            example: "TEAM"
+        - name: "favorite_id"
+          in: "query"
+          description: "id to delete"
+          required: false
+          schema:
+            type: integer
+            format: int32
+            example: 939
       responses:
         '202':
           description: "successful operation, element removed from favorite"
@@ -256,7 +263,7 @@ paths:
           description: "Element wasn't in your favorite list"
         "410":
           description: "No such type: element must be TEAM/PLAYER/GAME"
-          example: "No such type: Team must be TEAM/PLAYER/GAME"
+          # example: "No such type: Team must be TEAM/PLAYER/GAME"
         "429":
           description: "Out of tokens in SportMonks API"
   /users/favoritePlayers: 
@@ -490,7 +497,7 @@ paths:
           description: "team id for filter"
           required: false
           schema:
-            type: int
+            type: integer
             format: int32
             example: 3468
         - name: "position"
@@ -498,7 +505,7 @@ paths:
           description: "position for filter 1-4"
           required: false
           schema:
-            type: int
+            type: integer
             format: int32
       responses:
         '200':
@@ -507,11 +514,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerPreview'
-        "400": 
+        '400': 
           description: "Invalid name supplied"
-        "404":
+        '404':
           description: "Player: {element} not found"
-        "429":
+        '429':
           description: "Out of tokens in SportMonks API"
   /search/last:
     get:
@@ -532,7 +539,7 @@ paths:
         "201": 
           description: "User found logged, but no search history."
         "401": 
-        description: "User not logged in, can't search for history."
+          description: "User not logged in, can't search for history."
         "404":
           description: "Player: {element} not found"
         "429":
@@ -633,17 +640,6 @@ components:
           type: integer
           format: int32
           example: 1
-    userMainPage:
-      type: "object"
-      required:
-        - user
-      properties:
-        user: 
-            $ref: '#/components/schemas/User'
-        favoritGames:
-          type: array
-          items:
-            $ref: '#/components/schemas/Game'
     RegUser:
       type: "object"
       properties:
@@ -785,17 +781,6 @@ components:
           type: string
           description: "weight might be null"
           example: "72.5 kg"
-    gameReport: 
-      type: object
-      properties: 
-        id: 
-          type: integer
-          format: int32
-          example: 24
-        reportsArray:
-          type: array
-          items: 
-            $ref: '#/components/schemas/report'
     referee: 
       type: object
       properties: 
@@ -922,7 +907,7 @@ components:
       type: "object"
       properties:
         stageID:
-          type: int
+          type: integer
           format: int32
           example: 450
         upcoming_games:
@@ -937,15 +922,15 @@ components:
       type: "object"
       properties:
         gameID:
-          type: int
+          type: integer
           format: int32
           example: 3
         homeTeamScore:
-          type: int
+          type: integer
           format: int32
           example: 2
         awayTeamScore:
-          type: int
+          type: integer
           format: int32
           example: 3
     # favoriteGamesPage:
@@ -1020,6 +1005,3 @@ components:
           type: string
           format: DATETIME
           example: "2021-05-26T00:00:00.00"
-
-
-
