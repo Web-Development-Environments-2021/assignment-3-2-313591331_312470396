@@ -1,10 +1,13 @@
 var express = require("express");
 var router = express.Router();
 const player_utils = require("./utils/player_utils");
+const user_auth = require("../middleware/mid_user");
 
 router.get("/:playerID", async (req, res, next) => {
   try {
-    const player_details = await player_utils.getPlayerUtils(req.params.playerID);
+    const player_details = await player_utils.getPlayerUtils(
+      req.params.playerID
+    );
     res.send(player_details);
   } catch (error) {
     next(error);
@@ -13,11 +16,54 @@ router.get("/:playerID", async (req, res, next) => {
 
 router.get("/search/:playerName", async (req, res, next) => {
   try {
-    const player_details = await player_utils.getPlayerByName(req.params.playerName);
+    let player_details;
+    let filter_team = req.query.team;
+    let filter_position = req.query.position;
+    player_details = await player_utils.getPlayerByName(
+      req.params.playerName,
+      filter_team,
+      filter_position
+    );
+    if (req.session && req.session.user_id) {
+      //User
+      req.session.search = {
+        type: "PLAYER",
+        name: req.params.playerName,
+        team: filter_team,
+        pos: filter_position,
+      };
+    }
     res.send(player_details);
   } catch (error) {
     next(error);
   }
 });
+router.get("/search/last/cookie", async (req, res, next) => {
+  try {
+    if (
+      req.session &&
+      req.session.search &&
+      req.session.search.type == "PLAYER"
+    ) {
+      let player_details = await player_utils.getPlayerByName(
+        req.session.search.name,
+        req.session.search.team,
+        req.session.search.pos
+      );
+      res.send(player_details);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+// router.get("/allPlayers/:seasonID", async (req, res, next) => {
+//   try {
+//     const teams = await player_utils.getAllPlayersBySeason(req.params.seasonID);
+//     res.send(teams);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 module.exports = router;

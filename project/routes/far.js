@@ -5,13 +5,13 @@ const gameUtils = require("./utils/game_utils");
 const far_auth = require("../middleware/mid_FAR");
 router.use(far_auth);
 router.get("/", async (req, res, next) => {
-  try{
-    const games = await gameUtils.getAllGames()
-    res.send(games)
-  }catch(err){
-    res.send(err)
+  try {
+    const games = await gameUtils.getAllGames();
+    res.send(games);
+  } catch (err) {
+    res.send(err);
   }
-})
+});
 router.post("/addReferee", async (req, res, next) => {
   try {
     const qualification = req.body.qualification;
@@ -29,20 +29,26 @@ router.post("/addReferee", async (req, res, next) => {
   }
 });
 
-router.put("/addGameResult", async (req,res,next) => {
-  try{
+router.put("/updateGameResult", async (req, res, next) => {
+  try {
     // const {gameID,homeTeamResult,awayTeamResult} = req.body
-    res.send(await gameUtils.addGameResult(req.body))
+    res.send(await gameUtils.updateGameResult(req.body));
     // res.send({gameID,homeTeamResult,awayTeamResult})
-  }catch(err){res.status(err.status).send(err.message)}
-})
+  } catch (err) {
+    res.status(err.status).send(err.message);
+  }
+});
 
-router.post("/addReport", async (req,res,next) => {
-  try{
-    await gameUtils.addReport(req.body)
-      res.status(200).send("Game Report Added successfully")
-  }catch(err){res.send(err)}
-})
+router.post("/addReport", async (req, res, next) => {
+  await gameUtils
+    .addReport(req.body)
+    .then(() => {
+      res.status(200).send("Game Report Added successfully");
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
 
 router.post("/addGame", async (req, res, next) => {
   try {
@@ -55,10 +61,14 @@ router.post("/addGame", async (req, res, next) => {
     const awayTeamID = req.body.awayTeamID;
     const gameDate = req.body.gameDate;
 
-    // const currentDate = new Date(); 
+    // const currentDate = new Date();
     // const gameAsDate = new Date ()
     if (new Date() > new Date(gameDate))
-    throw { status: 402, message: "cannot create Game" };
+      throw {
+        status: 402,
+        message:
+          "Can't create game,that his date has passed.Choose another date",
+      };
 
     // might be undefined. Handled in the game-util.
     await gameUtils.addGame(

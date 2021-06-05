@@ -1,6 +1,5 @@
 var express = require("express");
 var router = express.Router();
-const user_auth = require("./mid_user");
 router.use(async function (req, res, next) {
   if (req.session.type === "FAR") {
     next();

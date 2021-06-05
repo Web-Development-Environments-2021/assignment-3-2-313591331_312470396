@@ -5,13 +5,14 @@ async function getPlayerUtils(player_id) {
   const player = await axios.get(`${api_domain}/players/${player_id}`, {
     params: {
       api_token: process.env.api_token,
+      include: "team",
     },
   });
-  console.log(player);
   return {
     preview: {
+      player_id: player_id,
       name: player.data.data.fullname,
-      team_name: player.data.data.team_id,
+      team_name: player.data.data.team.data.name,
       image: player.data.data.image_path,
       position: player.data.data.position_id,
     },
@@ -66,9 +67,10 @@ function extractRelevantPlayerData(players_info) {
     ) {
       throw { status: 429, message: "Out of tokens in SportMonks API." };
     }
-    const { fullname, image_path, position_id } = player_info;
+    const { player_id, fullname, image_path, position_id } =
+      player_info.data.data;
     const { name } = player_info.data.data.team.data;
-    playersData.push({ fullname, image_path, position_id, name });
+    playersData.push({ player_id, fullname, image_path, position_id, name });
   });
   return playersData;
 }
@@ -80,17 +82,35 @@ async function getPlayersByTeam(team_id) {
 }
 
 async function markPlayerAsFavorite(user_id, player_id) {
-  try {
-    await getPlayerUtils(player_id);
-  } catch (error) {
+  await getPlayerUtils(player_id).catch((err) => {
     throw { status: 404, message: "Player " + player_id + "not found" };
-  }
-  DButils.execQuery(
+  });
+  await DButils.execQuery(
     `insert into FavoritePlayers values ('${user_id}',${player_id})`
+  ).catch((err) => {
+    if (err.number == 2627) {
+      throw { status: 408, message: "Player already in your favorite list" };
+    }
+    throw err;
+  });
+}
+
+async function unmarkPlayerAsFavorite(user_id, player_id) {
+  await getPlayerUtils(player_id).catch((err) => {
+    throw { status: 404, message: "Player " + player_id + "not found" };
+  });
+  const res = await DButils.execQuery(
+    `Select * FROM FavoritePlayers WHERE (user_id ='${user_id}' AND player_id = '${player_id}')`
+  );
+  if (res.length === 0) {
+    throw { status: 408, message: "Player wasn't in your favorite list" };
+  }
+  await DButils.execQuery(
+    `DELETE FROM FavoritePlayers WHERE (user_id ='${user_id}' AND player_id = '${player_id}')`
   );
 }
 
-async function getPlayerByName(player_name) {
+async function getPlayerByName(player_name, filter_team, filter_position) {
   const player = await axios.get(
     `${api_domain}/players/search/${player_name}`,
     {
@@ -99,13 +119,33 @@ async function getPlayerByName(player_name) {
       },
     }
   );
-  return extractRelevantPlayerDataForSearch(player.data.data);
+  if (player.data.data.length > 0) {
+    return extractRelevantPlayerDataForSearch(
+      player.data.data,
+      filter_team,
+      filter_position
+    );
+  } else {
+    throw { status: 404, message: "Player: " + player_name + " not found." };
+  }
 }
-
-function extractRelevantPlayerDataForSearch(players_info) {
+function extractRelevantPlayerDataForSearch(
+  players_info,
+  filter_team,
+  filter_position
+) {
+  if (filter_team) {
+    players_info = players_info.filter((player) => {
+      return player.team_id == filter_team;
+    });
+  }
+  if (filter_position) {
+    players_info = players_info.filter((player) => {
+      return player.position_id == filter_position;
+    });
+  }
   return players_info.map((player_info) => {
     const { fullname, image_path, position_id, team_id } = player_info;
-    // const { name } = player_info.data.data.team.data;
     return {
       name: fullname,
       team_name: team_id,
@@ -114,9 +154,9 @@ function extractRelevantPlayerDataForSearch(players_info) {
     };
   });
 }
-
 exports.getPlayersByTeam = getPlayersByTeam;
 exports.getPlayersInfo = getPlayersInfo;
 exports.getPlayerUtils = getPlayerUtils;
 exports.markPlayerAsFavorite = markPlayerAsFavorite;
 exports.getPlayerByName = getPlayerByName;
+exports.unmarkPlayerAsFavorite = unmarkPlayerAsFavorite;

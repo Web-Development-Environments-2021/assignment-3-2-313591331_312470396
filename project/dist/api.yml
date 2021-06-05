@@ -26,7 +26,9 @@ tags:
   - name: favorite
     description: Favorites Players, Teams, Games
   - name: FAR
-    description: FootBall Association Representor actions 
+    description: FootBall Association Representor actions
+  - name: Search
+    description: Search page, including filtered player and team search. remember your last search. 
 paths:
   /league/:
     get:
@@ -87,7 +89,7 @@ paths:
         '201':
           description: "User logout succeed"
         '401':
-          description: "User is already logged out"
+          description: "You must be logged in to do: logout"
   /auth/register:
     post:
       tags:
@@ -96,7 +98,7 @@ paths:
       description: "Added a user into the database"
       operationId: "createUser"
       requestBody:
-        description: JSON object for register
+        description: JSON object for register. **Username** must be between 3-8 chars and has valid english chars only **Password** for login in clear text,5-10 chars, at least one number and one special character
         required: true
         content:
           application/json:
@@ -124,6 +126,7 @@ paths:
           schema:
             type: integer
             format: int64
+          example: 939
       responses:
         '200':
           description: "successful operation,team returned"
@@ -137,31 +140,7 @@ paths:
           description: "Team not found"
         "429":
           description: "Out of tokens in SportMonks API"
-  /team/search/{teamName}:
-    get:
-      tags:
-      - "team"
-      summary: "Find team by Name"
-      description: "Returns a team"
-      operationId: "getTeamByName"
-      parameters:
-        - name: "teamName"
-          in: "path"
-          description: "name of team to search for"
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: "successful operation player returned"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TeamPreview'
-        "400":
-          description: "Invalid name supplied"
-        "429":
-          description: "Out of tokens in SportMonks API"
+
   /stage/{stageID}:
     get:
       tags:
@@ -177,6 +156,7 @@ paths:
           schema:
             type: integer
             format: int64
+            example: 467
       responses:
         '200':
           description: "successful operation,team returned"
@@ -218,33 +198,7 @@ paths:
           description: "Player not found"
         "429":
           description: "Out of tokens in SportMonks API"
-  /player/search/{playerName}:
-    get:
-      tags:
-      - "player"
-      summary: "Find player by Name"
-      description: "Returns a single player"
-      operationId: "getPlayerPageByName"
-      parameters:
-        - name: "playerName"
-          in: "path"
-          description: "name of player to search for"
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: "successful operation player returned"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlayerPreview'
-        "400":
-          description: "Invalid name supplied"
-        "404":
-          description: "Player not found"
-        "429":
-          description: "Out of tokens in SportMonks API"
+  
   /users/favorite/:
     post:
       security:
@@ -269,6 +223,40 @@ paths:
           description: "Element not found"
         "406":
           description: "you can't add occurred games to the favorite"
+        "408":
+          description: "Element already in your favorite list"
+        "410":
+          description: "No such type: element must be TEAM/PLAYER/GAME"
+          example: "No such type: Team must be TEAM/PLAYER/GAME"
+        "429":
+          description: "Out of tokens in SportMonks API"
+    /users/favorite/:
+    delete:
+      security:
+        - cookieAuth: []
+      tags:
+      - "favorite"
+      summary: "Remove Team,Player or Game to the favorite list"
+      operationId: "RemoveFromFavorite"
+      requestBody:
+        description: JSON object for register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteBody'
+      responses:
+        '202':
+          description: "successful operation, element removed from favorite"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Element not found"
+        "408":
+          description: "Element wasn't in your favorite list"
+        "410":
+          description: "No such type: element must be TEAM/PLAYER/GAME"
+          example: "No such type: Team must be TEAM/PLAYER/GAME"
         "429":
           description: "Out of tokens in SportMonks API"
   /users/favoritePlayers: 
@@ -331,24 +319,24 @@ paths:
           description: "Invalid ID supplied"
         "429":
           description: "Out of tokens in SportMonks API"
-  /users/getFavoriteGamesPage:
-    get:
-      security:
-        - cookieAuth: []
-      tags:
-      - "favorite"
-      summary: "Get the favorite Games page for user"
-      responses:
-        '200':
-          description: "successful operation - games returned"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/favoriteGamesPage"
-        "400":
-          description: "Invalid ID supplied"
-        "429":
-          description: "Out of tokens in SportMonks API"
+  # /users/getFavoriteGamesPage:
+  #   get:
+  #     security:
+  #       - cookieAuth: []
+  #     tags:
+  #     - "favorite"
+  #     summary: "Get the favorite Games page for user"
+  #     responses:
+  #       '200':
+  #         description: "successful operation - games returned"
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/favoriteGamesPage"
+  #       "400":
+  #         description: "Invalid ID supplied"
+  #       "429":
+  #         description: "Out of tokens in SportMonks API"
   /far/addReferee:
     post:
       security:
@@ -413,13 +401,13 @@ paths:
           description: "You Must be a Football Association Representor"
         '402':
           description: "game doesn't exist"
-  /far/addGameResult:
+  /far/updateGameResult:
     put:
       security:
         - cookieAuth: []
       tags:
       - "FAR"
-      description: "adding result to a game that have occurred"
+      description: "update result to a game that have occurred"
       requestBody:
         content:
           application/json:
@@ -453,24 +441,125 @@ paths:
         '401':
           description: "You Must be a Football Association Representor"
         '402':
-          description: "cannot create Game"
+          description: "Can't create game,that his date has passed.Choose another date"
+  /search/team/{teamName}:
+    get:
+      tags:
+      - "search"
+      summary: "Find team by Name"
+      description: "Returns a team"
+      operationId: "getTeamByName"
+      parameters:
+        - name: "teamName"
+          in: "path"
+          description: "name of team to search for"
+          required: true
+          schema:
+            type: string
+          example: "Midtjyllan"
+      responses:
+        '200':
+          description: "successful operation player returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamPreview'
+        "400":
+          description: "Invalid name supplied"
+        "404":
+          description: "Team: {element} not found."
+        "429":
+          description: "Out of tokens in SportMonks API"
+  /search/team/{playerName}:
+    get:
+      tags:
+      - "search"
+      summary: "Find player by Name"
+      description: "Returns a single player"
+      operationId: "getPlayerPageByName"
+      parameters:
+        - name: "playerName"
+          in: "path"
+          description: "name of player to search for"
+          required: true
+          schema:
+            type: string
+            example: "modric"
+        - name: "team"
+          in: "query"
+          description: "team id for filter"
+          required: false
+          schema:
+            type: int
+            format: int32
+            example: 3468
+        - name: "position"
+          in: "query"
+          description: "position for filter 1-4"
+          required: false
+          schema:
+            type: int
+            format: int32
+      responses:
+        '200':
+          description: "successful operation player returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerPreview'
+        "400": 
+          description: "Invalid name supplied"
+        "404":
+          description: "Player: {element} not found"
+        "429":
+          description: "Out of tokens in SportMonks API"
+  /search/last:
+    get:
+      security:
+        - cookieAuth: []
+      tags:
+      - "search"
+      summary: "Returns logged user last search."
+      operationId: "SearchYourLastSearch"
+      responses:
+        '200':
+          description: "successful operation your last result history returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerPreview'
+                # $ref: '#/components/schemas/TeamPreview'
+        "201": 
+          description: "User found logged, but no search history."
+        "401": 
+        description: "User not logged in, can't search for history."
+        "404":
+          description: "Player: {element} not found"
+        "429":
+          description: "Out of tokens in SportMonks API"
 components:
   securitySchemes:
     cookieAuth:
       type: apiKey
       name: session
       in: cookie
+  # securitySchemes:
+  #   cookieAuth:
+  #     type: api_key
+  #     name: session
+  #     in: cookie
   schemas:
     leagueMainPageUser:
       type: "object"
       properties:
+        league_details:
+          $ref: '#/components/schemas/leagueMainPage'
         upcomingGames:
           type: array
           maxLength: 3
           items: 
             $ref: '#/components/schemas/Game' 
-        league_details:
-          $ref: '#/components/schemas/leagueMainPage'
+
     leagueMainPage:
       type: "object"
       properties:
@@ -557,8 +646,6 @@ components:
             $ref: '#/components/schemas/Game'
     RegUser:
       type: "object"
-      required:
-        - name
       properties:
         username:
           type: string
@@ -586,7 +673,7 @@ components:
           type: string
           minLength: 5
           maxLength: 10
-          example: "123456"
+          example: "Eden2410!"
         type:
           type: string
           example: "TeamUser"
@@ -648,9 +735,19 @@ components:
         logo:
           type: string
           example: "www.logo.com"
+        coach_id:
+          type: integer
+          format: int32
+          example: 15215
+        coach_fullname:
+          type: string
+          example: "Brian Priske Pedersen"
     PlayerPreview:
       type: object
       properties:
+        player_id:
+          type: string
+          example: "939"
         name:
           type: string
           example: "Neymar da Silva Santos Junior"
@@ -668,32 +765,26 @@ components:
     PlayerAdditional:
       type: object
       properties:
-        id:
-          type: integer
-          format: int32
-          example: 152
         common_name:
           type: string
           example: "Neymar JR"
         nationality:
           type: string
-          example: "israeli"
+          example: "Israel"
         birthdate:
           type: string
           format: date
-          example: 24-10-1994
+          example: 24/10/1994
         birthcountry:
           type: string
           example: "Israel"
         height:
-          type: number
-          format: double
-          example: 1.72
+          type: string
+          example: "1.72 cm"
         weight:
-          type: number
-          format: double
+          type: string
           description: "weight might be null"
-          example: 72.5
+          example: "72.5 kg"
     gameReport: 
       type: object
       properties: 
@@ -806,10 +897,11 @@ components:
     playerPage:
       type: "object"
       properties:
-        additional:
-          $ref: '#/components/schemas/PlayerAdditional'
         preview:
           $ref: '#/components/schemas/PlayerPreview'
+        additional:
+          $ref: '#/components/schemas/PlayerAdditional'
+
     teamPage:
       type: "object"
       properties:
@@ -819,14 +911,17 @@ components:
           type: array
           items: 
             $ref: '#/components/schemas/PlayerPreview'
-        upcoming_games:
-          type: array
-          items: 
-            $ref: '#/components/schemas/Game'
-        previous_games:
-          type: array
-          items: 
-            $ref: '#/components/schemas/Game'
+        games:
+          type: "object"
+          properties:
+            upcoming_games:
+              type: array
+              items: 
+                $ref: '#/components/schemas/Game'
+            previous_games:
+              type: array
+              items: 
+                $ref: '#/components/schemas/Game'
     stagePage:
       type: "object"
       properties:
@@ -857,17 +952,17 @@ components:
           type: int
           format: int32
           example: 3
-    favoriteGamesPage:
-      type: "object"
-      properties:
-        upcoming_games:
-          type: array
-          items: 
-            $ref: '#/components/schemas/Game'
-        previous_games:
-          type: array
-          items: 
-            $ref: '#/components/schemas/Game'
+    # favoriteGamesPage:
+    #   type: "object"
+    #   properties:
+    #     upcoming_games:
+    #       type: array
+    #       items: 
+    #         $ref: '#/components/schemas/Game'
+    #     previous_games:
+    #       type: array
+    #       items: 
+    #         $ref: '#/components/schemas/Game'
     TeamPreview:
       type: "object"
       properties:
@@ -880,6 +975,55 @@ components:
         logo:
           type: string
           example: "wwww.logoPath.com"
+    OptionalInformativeCurrentStage:
+      type: "object"
+      properties:
+        gameID:
+          type: integer
+          format: int32
+          example: 001
+        leagueID:
+          type: integer
+          format: int32
+          example: 271
+        seasonID:
+          type: integer
+          format: int32
+          example: 145
+        stageID:
+          type: integer
+          format: int32
+          example: 467
+        refereeID:
+          type: integer
+          format: int32
+          example: 001
+        stadiumID:
+          type: integer
+          format: int32
+          example: 124
+        stadiumName:
+          type: string
+          format: int32
+          example: "Sami Offer"
+        homeTeamID:
+          type: integer
+          format: int32
+          example: 003
+        homeTeamName:
+          type: string
+          example: "Hapoel Haifa"
+        awayTeamID:
+          type: integer
+          format: int32
+          example: 004
+        AwayTeamName:
+          type: string
+          example: "Real Madrid"
+        gameDate:
+          type: string
+          format: DATETIME
+          example: "2021-05-26T00:00:00.00"
 
 
 
