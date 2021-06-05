@@ -61,8 +61,8 @@ bcrypt_saltRounds=13
 
 ### About the code:
 * We accomplished the *bonus* section.
-* To test you must have login as the Football Association Representor credentials which are:
-  *  username: EdenBer
-  *  password: Eden2410!
-* The DB contains some Dummy data, you more than welcome to go and insert your games, game reports, choose your favorites, and imply all the functionality the app expose.
-* 
+  * To test you must have login as the Football Association Representor credentials which are:
+    *  username: EdenBer
+    *  password: Eden2410!
+  * The DB contains some Dummy data, you more than welcome to go and insert your games, game reports, choose your favorites, and imply all the functionality the app expose.
+* Make sure to not run the ./sqlScripts/Tables - scripts the drops and initalize the exist DB.
