@@ -477,7 +477,7 @@ paths:
           description: "Team: {element} not found."
         "429":
           description: "Out of tokens in SportMonks API"
-  /search/team/{playerName}:
+  /search/player/{playerName}:
     get:
       tags:
       - "search"
@@ -513,7 +513,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlayerPreview'
+                $ref: '#/components/schemas/PlayerFromSearch'
         '400': 
           description: "Invalid name supplied"
         '404':
@@ -750,6 +750,29 @@ components:
         team_name:
           type: string
           example: "PSG"
+        image:
+          type: string
+          format: url 
+          example: "www.photo.com"
+        position:
+          type: integer
+          format: int32
+          example: 1
+    PlayerFromSearch:
+      type: object
+      properties:
+        player_id:
+          type: string
+          example: "939"
+        name:
+          type: string
+          example: "Neymar da Silva Santos Junior"
+        team_name:
+          type: string
+          example: "Real Madrid"
+        team_id:
+          type: string
+          example: "739"
         image:
           type: string
           format: url 

@@ -1,6 +1,7 @@
 const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const DButils = require("./DButils");
+const team_utils = require('./team_utils')
 async function getPlayerUtils(player_id) {
   const player = await axios.get(`${api_domain}/players/${player_id}`, {
     params: {
@@ -116,6 +117,7 @@ async function getPlayerByName(player_name, filter_team, filter_position) {
     {
       params: {
         api_token: process.env.api_token,
+        include: "team",
       },
     }
   );
@@ -129,7 +131,7 @@ async function getPlayerByName(player_name, filter_team, filter_position) {
     throw { status: 404, message: "Player: " + player_name + " not found." };
   }
 }
-function extractRelevantPlayerDataForSearch(
+async function extractRelevantPlayerDataForSearch(
   players_info,
   filter_team,
   filter_position
@@ -144,15 +146,15 @@ function extractRelevantPlayerDataForSearch(
       return player.position_id == filter_position;
     });
   }
-  return players_info.map((player_info) => {
-    const { fullname, image_path, position_id, team_id } = player_info;
-    return {
-      name: fullname,
-      team_name: team_id,
-      image: image_path,
-      position: position_id,
-    };
-  });
+  return players_info.map(player => 
+    ({
+      name: player.fullname,
+      team_id: player.team_id,
+      team_name: player.team.data.name,
+      image: player.image_path,
+      position: player.position_id,
+    })
+  )  
 }
 exports.getPlayersByTeam = getPlayersByTeam;
 exports.getPlayersInfo = getPlayersInfo;

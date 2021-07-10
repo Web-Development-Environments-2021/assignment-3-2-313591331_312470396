@@ -44,11 +44,11 @@ router.get("/team/:teamName", async (req, res, next) => {
   }
 });
 
+// router.use(function (err, req, res, next) {
+//   console.error(err);
+//   res.status(401).send("User not logged in, can't search for history.");
+// });
 router.use(user_auth);
-router.use(function (err, req, res, next) {
-  console.error(err);
-  res.status(401).send("User not logged in, can't search for history.");
-});
 
 router.get("/last", async (req, res, next) => {
   try {
