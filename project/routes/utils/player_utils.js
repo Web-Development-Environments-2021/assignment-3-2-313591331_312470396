@@ -1,7 +1,7 @@
 const axios = require("axios");
 const api_domain = "https://soccer.sportmonks.com/api/v2.0";
 const DButils = require("./DButils");
-const team_utils = require('./team_utils')
+const team_utils = require("./team_utils");
 async function getPlayerUtils(player_id) {
   const player = await axios.get(`${api_domain}/players/${player_id}`, {
     params: {
@@ -12,10 +12,10 @@ async function getPlayerUtils(player_id) {
   return {
     preview: {
       player_id: player_id,
-      name: player.data.data.fullname,
+      full_name: player.data.data.fullname,
       team_name: player.data.data.team.data.name,
       image: player.data.data.image_path,
-      position: player.data.data.position_id,
+      position_id: player.data.data.position_id,
     },
     additional: {
       common_name: player.data.data.common_name,
@@ -70,8 +70,15 @@ function extractRelevantPlayerData(players_info) {
     }
     const { player_id, fullname, image_path, position_id } =
       player_info.data.data;
+
     const { name } = player_info.data.data.team.data;
-    playersData.push({ player_id, fullname, image_path, position_id, name });
+    playersData.push({
+      player_id,
+      full_name: fullname,
+      image: image_path,
+      position_id,
+      team_name: name,
+    });
   });
   return playersData;
 }
@@ -146,15 +153,13 @@ async function extractRelevantPlayerDataForSearch(
       return player.position_id == filter_position;
     });
   }
-  return players_info.map(player => 
-    ({
-      name: player.fullname,
-      team_id: player.team_id,
-      team_name: player.team.data.name,
-      image: player.image_path,
-      position: player.position_id,
-    })
-  )  
+  return players_info.map((player) => ({
+    full_name: player.fullname,
+    team_name: player.team.data.name,
+    team_id: player.team_id,
+    image: player.image_path,
+    position_id: player.position_id,
+  }));
 }
 exports.getPlayersByTeam = getPlayersByTeam;
 exports.getPlayersInfo = getPlayersInfo;

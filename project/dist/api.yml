@@ -744,7 +744,7 @@ components:
         player_id:
           type: string
           example: "939"
-        name:
+        full_name:
           type: string
           example: "Neymar da Silva Santos Junior"
         team_name:
@@ -754,17 +754,14 @@ components:
           type: string
           format: url 
           example: "www.photo.com"
-        position:
+        position_id:
           type: integer
           format: int32
           example: 1
     PlayerFromSearch:
       type: object
       properties:
-        player_id:
-          type: string
-          example: "939"
-        name:
+        full_name:
           type: string
           example: "Neymar da Silva Santos Junior"
         team_name:
@@ -777,7 +774,7 @@ components:
           type: string
           format: url 
           example: "www.photo.com"
-        position:
+        position_id:
           type: integer
           format: int32
           example: 1

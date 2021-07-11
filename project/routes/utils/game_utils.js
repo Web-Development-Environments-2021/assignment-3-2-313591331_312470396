@@ -1,6 +1,7 @@
 const DButils = require("./DButils");
 
 async function getGameUtils(game_id) {
+  if (game_id.length === 0) return [];
   const gameIds =
     "(" +
     game_id.reduce((accumulator, game) => {
