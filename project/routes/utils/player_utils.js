@@ -153,13 +153,23 @@ async function extractRelevantPlayerDataForSearch(
       return player.position_id == filter_position;
     });
   }
-  return players_info.map((player) => ({
-    full_name: player.fullname,
-    team_name: player.team.data.name,
-    team_id: player.team_id,
-    image: player.image_path,
-    position_id: player.position_id,
-  }));
+  return players_info.map((player) => {
+    if (player.team == null) {
+    }
+    let player_filtered = {
+      player_id: player.player_id,
+      full_name: player.fullname,
+      team_name: null,
+      team_id: null,
+      image: player.image_path,
+      position_id: player.position_id,
+    };
+    if (player.team_id != null) {
+      player_filtered.team_name = player.team.data.name;
+      player_filtered.team_id = player.team_id;
+    }
+    return player_filtered;
+  });
 }
 exports.getPlayersByTeam = getPlayersByTeam;
 exports.getPlayersInfo = getPlayersInfo;
