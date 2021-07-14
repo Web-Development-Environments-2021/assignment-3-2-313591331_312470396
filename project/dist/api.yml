@@ -74,6 +74,10 @@ paths:
               schema:
                 type: string
                 example: session=8dsf8esaf65c1xdf3ax2asdcz3asd
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginObj'
         '401':
           description: "Username or Password incorrect"
   /auth/logout:
@@ -938,6 +942,15 @@ components:
           type: array
           items: 
             $ref: '#/components/schemas/Game'
+    loginObj:
+      type: "object"
+      properties:
+        username:
+          type: string
+          example: "EdenBer"            
+        image:
+          type: string
+          example: "www.image.co.il"
     addGameResult:
       type: "object"
       properties:

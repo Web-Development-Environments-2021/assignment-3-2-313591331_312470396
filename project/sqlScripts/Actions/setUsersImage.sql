@@ -1,0 +1,1 @@
+UPDATE Users SET img = 'https://i.ibb.co/yh5f6Z8/image.png'

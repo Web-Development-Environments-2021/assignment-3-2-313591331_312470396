@@ -39,9 +39,10 @@ router.post("/Login", async (req, res, next) => {
     // Set cookie
     req.session.user_id = user.user_id;
     req.session.type = user.type;
+    console.log(user);
 
     // return cookie
-    res.status(200).send("User login succeeded");
+    res.status(200).send({ username: user.username, image: user.img });
   } catch (error) {
     next(error);
   }
