@@ -117,9 +117,23 @@ async function helperValidTeamExist(team_id) {
     },
   });
 }
+
+async function getTeamName(team_id) {
+  try {
+    let team = await axios.get(`${api_domain}/teams/${team_id}`, {
+      params: {
+        api_token: process.env.api_token,
+      },
+    });
+    return team.data.data.name;
+  } catch (err) {
+    console.log(err);
+  }
+}
 exports.getTeamUtils = getTeamUtils;
 exports.getTeamsInfo = getTeamsInfo;
 exports.markTeamAsFavorite = markTeamAsFavorite;
 exports.extractRelevantTeamDataForSearch = extractRelevantTeamDataForSearch;
 exports.getTeamByName = getTeamByName;
 exports.unmarkTeamAsFavorite = unmarkTeamAsFavorite;
+exports.getTeamName = getTeamName;

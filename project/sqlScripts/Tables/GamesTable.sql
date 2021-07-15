@@ -12,7 +12,7 @@ CREATE TABLE dbo.Games
     stadiumID INT NOT NULL,
     homeTeamID INT NOT NULL,
     awayTeamID INT NOT NULL,
-    gameDate DATE NOT NULL,
+    gameDate DATETIME NOT NULL,
     homeScore INT ,
     awayScore INT ,
 );

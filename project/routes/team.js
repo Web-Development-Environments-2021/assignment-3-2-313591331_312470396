@@ -10,5 +10,15 @@ router.get("/:teamID", async (req, res, next) => {
     next(error);
   }
 });
+router.get("/name/:teamID", async (req, res, next) => {
+  try {
+    console.log(req.params.teamID);
+    const team = await team_utils.getTeamName(req.params.teamID);
+    res.send(team);
+
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
